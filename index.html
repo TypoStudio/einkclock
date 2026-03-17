@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Ink Clock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,300,0,0" rel="stylesheet">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RW8JKPYQ96"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-RW8JKPYQ96');
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #000; color: #fff;
+      font-family: 'Courier New', Courier, monospace;
+      width: 100vw; height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      overflow: hidden; user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body.light { background: #fff; color: #000; }
+    body.light .divider, body.light .w-sep { background: #000; }
+
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal; font-style: normal;
+      font-size: inherit; line-height: 1;
+      letter-spacing: normal; text-transform: none;
+      display: inline-block; white-space: nowrap;
+      direction: ltr; color: inherit;
+    }
+
+    /* ── 고정 버튼 ── */
+    #invert-btn, #mode-btn {
+      position: fixed; top: 3vw;
+      font-size: 6vw; cursor: pointer;
+      background: none; border: none; color: inherit;
+      padding: 1vw; line-height: 1; z-index: 10;
+      display: flex; align-items: center;
+    }
+    #invert-btn { left: 3vw; }
+    #mode-btn   { left: 12vw; }
+    #help-btn   { position: fixed; top: 3vw; left: 21vw; font-size: 6vw; cursor: pointer;
+      background: none; border: none; color: inherit; padding: 1vw; line-height: 1; z-index: 10;
+      display: flex; align-items: center; }
+    body.analog #help-btn { display: none; }
+
+    /* ── 도움말 팝업 ── */
+    #help-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.92); z-index: 200; overflow-y: auto;
+      flex-direction: column; align-items: center; padding: 6vw 0 10vw; }
+    #help-overlay.open { display: flex; }
+    body.light #help-overlay { background: rgba(255,255,255,0.95); }
+    #help-content { width: 88vw; font-size: 3.8vw; line-height: 1.9; }
+    #help-content h2 { font-size: 6vw; font-weight: 700; margin-bottom: 5vw; text-align: center; letter-spacing: 0.05em; }
+    #help-content h3 { font-size: 4.5vw; font-weight: 700; margin: 4vw 0 1.5vw; border-bottom: 1px solid; padding-bottom: 1vw; }
+    #help-content p, #help-content li { font-size: 3.8vw; margin: 0.5vw 0; }
+    #help-content ul { padding-left: 4vw; }
+    #help-content .row { display: flex; gap: 2vw; align-items: baseline; margin: 0.8vw 0; }
+    #help-content .label { min-width: 22vw; font-weight: 700; }
+    #help-close { display: block; margin: 7vw auto 0; font-size: 4vw; background: none;
+      border: 1px solid; color: inherit; font-family: 'Courier New', Courier, monospace;
+      padding: 1.5vw 8vw; cursor: pointer; letter-spacing: 0.1em; }
+    body.light #help-close { border-color: #000; color: #000; }
+
+    #clock-s { display: flex; flex-direction: column; align-items: center; font-size: 7vw; font-weight: 400; line-height: 1.1; align-self: center; padding: 0 2vw; }
+
+    /* ── 디지털 컨텐츠 ── */
+    #digital-content {
+      display: flex; flex-direction: column;
+      align-items: center; width: 100%;
+    }
+    body.analog #digital-content { display: none; }
+
+    #clock  { font-size: 32vw; font-weight: 700; letter-spacing: -0.02em; line-height: 1; text-align: center; margin-top: 11vw; margin-bottom: 3vw; display: flex; align-items: baseline; justify-content: center; }
+    #date   { font-size: 7vw; margin-top: 0vw; letter-spacing: 0.08em; text-align: center; }
+    #day    { font-size: 5vw; letter-spacing: 0.2em; margin-top: 1vw; margin-bottom: 5vw; text-align: center; }
+    .divider { width: 80vw; height: 2px; background: #fff; margin: 3vw auto; }
+
+    /* ── 현재 날씨 ── */
+    #weather-row { display: flex; width: 90vw; align-items: flex-start; justify-content: center; }
+    .weather-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1vw; cursor: pointer; }
+    .w-sep  { width: 2px; align-self: stretch; background: #fff; margin: 0 3vw; }
+    .w-name { font-size: 4vw; letter-spacing: 0.1em; text-align: center; cursor: pointer; border-bottom: 1px dashed currentColor; padding-bottom: 0.5vw; }
+    .w-main { display: flex; align-items: center; gap: 2vw; }
+    .w-icon { font-size: 8vw; line-height: 1; }
+    .w-temp { font-size: 8vw; font-weight: 700; letter-spacing: -0.02em; }
+    .w-desc-row { display: flex; align-items: center; gap: 1.5vw; }
+    .w-desc   { font-size: 3.5vw; letter-spacing: 0.1em; }
+    .w-detail { font-size: 2.8vw; letter-spacing: 0.04em; text-align: center; }
+    .w-weekly-sel { font-size: 3.5vw; line-height: 1; visibility: hidden; }
+    .weather-col.weekly-active .w-weekly-sel { visibility: visible; }
+
+    /* ── 주간 날씨 ── */
+    #weekly-section { width: 90vw; display: flex; flex-direction: column; align-items: center; gap: 2vw; }
+    #weekly-row { display: flex; width: 100%; justify-content: space-between; align-items: flex-start; }
+    .day-col  { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.8vw; padding: 1vw 0.5vw; }
+    .day-name { font-size: 3vw; letter-spacing: 0.05em; }
+    .day-icon { font-size: 5vw; line-height: 1; }
+    .day-max  { font-size: 3.5vw; font-weight: 700; }
+    .day-min  { font-size: 3vw; }
+
+    /* ── 아날로그 시계 ── */
+    #analog-clock { display: none; }
+    body.analog #analog-clock { display: block; }
+    body.analog-rect #analog-clock { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0; }
+    body.analog-fullscreen #analog-clock { position: fixed; top: 0; left: 0; z-index: 0; }
+    body.analog #invert-btn, body.analog #mode-btn { top: auto; bottom: 4vw; }
+    body.analog-fullscreen #invert-btn, body.analog-fullscreen #mode-btn { bottom: 14vw; }
+    body.analog #invert-btn { left: calc(50% - 10vw); }
+    body.analog #mode-btn   { left: calc(50%); }
+
+    /* ── 달력 ── */
+    #cal-overlay { display: none; flex-direction: column; align-items: center; width: 101%; height: 60vw }
+    #cal-overlay.open { display: flex; }
+    #cal-header { display: flex; align-items: center; justify-content: space-between;
+      width: 90vw; margin-bottom: 2vw; }
+    #cal-title { font-size: 5.5vw; font-weight: 700; letter-spacing: 0.05em; }
+    .cal-nav { background: none; border: none; color: inherit; font-size: 8vw;
+      cursor: pointer; padding: 0.5vw 2vw; line-height: 1; }
+    #cal-days { display: grid; grid-template-columns: repeat(7, 1fr);
+      width: 90vw; margin-bottom: 0.5vw; }
+    .cal-day-name { font-size: 3vw; text-align: center; padding: 0.5vw 0;
+      letter-spacing: 0.05em; opacity: 0.6; }
+    #cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); width: 90vw; gap: 0.5vw; }
+    .cal-cell { font-size: 4vw; text-align: center; padding: 1vw 0;
+      border-radius: 1vw; }
+    .cal-cell.today { border: 2px solid currentColor; font-weight: 700; }
+    .cal-cell.empty { }
+    .cal-cell.sunday { opacity: 0.5; }
+    .cal-cell.saturday { opacity: 0.5; }
+
+    /* ── 모달 ── */
+    #modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.88); z-index: 100;
+      flex-direction: column; align-items: center; justify-content: flex-start; padding: 5vw; padding-top: 8vh;
+    }
+    body.light #modal { background: rgba(255,255,255,0.93); }
+    #modal.open { display: flex; }
+    #modal-title { font-size: 5vw; margin-bottom: 3vw; letter-spacing: 0.1em; }
+    #modal-input {
+      width: 80vw; font-size: 5vw; font-family: 'Courier New', Courier, monospace;
+      padding: 2vw 3vw; background: #000; color: #fff; border: 2px solid #fff; outline: none; letter-spacing: 0.05em;
+    }
+    body.light #modal-input { background: #fff; color: #000; border-color: #000; }
+    #modal-btn {
+      margin-top: 2vw; width: 80vw; font-size: 5vw;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 2vw; background: #fff; color: #000; border: none; cursor: pointer; letter-spacing: 0.1em;
+    }
+    body.light #modal-btn { background: #000; color: #fff; }
+    #modal-results { width: 80vw; margin-top: 2vw; max-height: 40vh; overflow-y: auto; }
+    .result-item { padding: 2.5vw 3vw; border-bottom: 1px solid #555; font-size: 3.5vw; cursor: pointer; letter-spacing: 0.03em; line-height: 1.4; }
+    .result-item:active { background: #333; }
+    body.light .result-item:active { background: #ddd; }
+    #modal-close {
+      margin-top: 3vw; font-size: 4vw; background: none;
+      border: 1px solid #fff; color: #fff;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 1.5vw 5vw; cursor: pointer; letter-spacing: 0.1em;
+    }
+    body.light #modal-close { border-color: #000; color: #000; }
+    #modal-status { font-size: 3.5vw; margin-top: 2vw; letter-spacing: 0.05em; min-height: 5vw; }
+  </style>
+</head>
+<body>
+  <button id="invert-btn"><span class="material-symbols-outlined">light_mode</span></button>
+  <button id="mode-btn"><span class="material-symbols-outlined">schedule</span></button>
+  <button id="help-btn"><span class="material-symbols-outlined">help_outline</span></button>
+
+  <!-- 도움말 팝업 -->
+  <div id="help-overlay">
+    <div id="help-content">
+      <h2>사용법</h2>
+
+      <h3>공통 버튼</h3>
+      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vw;vertical-align:middle">light_mode</span> 버튼</span><span>화면 밝기 반전 (흑·백 전환)</span></div>
+      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vw;vertical-align:middle">schedule</span> 버튼</span><span>디지털 ↔ 아날로그 모드 전환</span></div>
+      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vw;vertical-align:middle">help_outline</span> 버튼</span><span>이 도움말 표시 (디지털 모드에서만)</span></div>
+
+      <h3>디지털 모드</h3>
+      <ul>
+        <li>화면을 두 번 연속 터치하면 전체화면으로 전환됩니다.</li>
+        <li>날짜를 터치하면 달력이 표시됩니다. 다시 터치하면 날씨로 돌아옵니다.</li>
+        <li>달력에서 ‹ / › 버튼으로 이전·다음 달로 이동합니다.</li>
+        <li>날씨 지역명을 터치하면 위치를 변경할 수 있습니다.</li>
+        <li>날씨 설명 아래 ▼ 버튼으로 주간 예보 지역을 선택합니다.</li>
+      </ul>
+
+      <h3>아날로그 모드</h3>
+      <ul>
+        <li>시계를 한 번 터치하면 눈금 스타일이 순서대로 바뀝니다.</li>
+        <li>시계를 두 번 연속 터치하면 전체화면으로 전환됩니다.</li>
+      </ul>
+      <div class="row"><span class="label">0 — 원형</span><span>눈금 없음</span></div>
+      <div class="row"><span class="label">1 — 원형</span><span>4분할 눈금</span></div>
+      <div class="row"><span class="label">2 — 원형</span><span>12분할 눈금</span></div>
+      <div class="row"><span class="label">3 — 원형</span><span>60선 눈금</span></div>
+      <div class="row"><span class="label">4 — 원형</span><span>60점 눈금</span></div>
+      <div class="row"><span class="label">5 — 사각형</span><span>60선 눈금 (각도기준)</span></div>
+      <div class="row"><span class="label">6 — 사각형</span><span>60점 눈금 (각도기준)</span></div>
+      <div class="row"><span class="label">7 — 사각형</span><span>60점 눈금 (균등배치)</span></div>
+      <div class="row"><span class="label">8 — 전체화면</span><span>60선 눈금 (균등배치)</span></div>
+      <div class="row"><span class="label">9 — 전체화면</span><span>60선 눈금 (각도기준)</span></div>
+      <div class="row"><span class="label">10 — 전체화면</span><span>60점 눈금 (각도기준)</span></div>
+      <div class="row"><span class="label">11 — 전체화면</span><span>60점 눈금 (균등배치)</span></div>
+
+      <button id="help-close">닫기</button>
+
+      <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
+        <div>Copyright &copy; 2026 TypoStudio</div>
+        <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
+      </div>
+    </div>
+  </div>
+  <!-- 디지털 모드 -->
+  <div id="digital-content">
+    <div id="clock"><span id="clock-h">--</span><span id="clock-s">--</span><span id="clock-m">--</span></div>
+    <div id="date">---- . -- . --</div>
+    <div id="day">-------</div>
+    <div class="divider"></div>
+    <div id="weather-row">
+      <div class="weather-col" id="w0">
+        <div class="w-name" data-idx="0">구로3동</div>
+        <div class="w-main">
+          <span class="w-icon material-symbols-outlined">wb_sunny</span>
+          <span class="w-temp">--°</span>
+        </div>
+        <div class="w-desc-row"><div class="w-desc">로딩중</div><span class="w-weekly-sel">▼</span></div>
+        <div class="w-detail"></div>
+      </div>
+      <div class="w-sep"></div>
+      <div class="weather-col" id="w1">
+        <div class="w-name" data-idx="1">신갈동</div>
+        <div class="w-main">
+          <span class="w-icon material-symbols-outlined">wb_sunny</span>
+          <span class="w-temp">--°</span>
+        </div>
+        <div class="w-desc-row"><div class="w-desc">로딩중</div><span class="w-weekly-sel">▼</span></div>
+        <div class="w-detail"></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div id="weekly-section">
+      <div id="weekly-row"><!-- JS로 채움 --></div>
+    </div>
+    <!-- 달력 (날씨 대체) -->
+    <div id="cal-overlay">
+      <div id="cal-header">
+        <button class="cal-nav" id="cal-prev">‹</button>
+        <span id="cal-title"></span>
+        <button class="cal-nav" id="cal-next">›</button>
+      </div>
+      <div id="cal-days">
+        <div class="cal-day-name sunday">일</div>
+        <div class="cal-day-name">월</div>
+        <div class="cal-day-name">화</div>
+        <div class="cal-day-name">수</div>
+        <div class="cal-day-name">목</div>
+        <div class="cal-day-name">금</div>
+        <div class="cal-day-name saturday">토</div>
+      </div>
+      <div id="cal-grid"></div>
+    </div>
+  </div>
+
+  <!-- 아날로그 모드 -->
+  <canvas id="analog-clock"></canvas>
+
+  <div id="modal">
+    <div id="modal-title">위치 검색</div>
+    <input id="modal-input" type="text" placeholder="동/읍/면 이름 입력" autocomplete="off">
+    <button id="modal-btn">검색</button>
+    <div id="modal-status"></div>
+    <div id="modal-results"></div>
+    <button id="modal-close">닫기</button>
+  </div>
+
+  <script>
+    const DAYS_FULL  = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+    const DAYS_SHORT = ['일','월','화','수','목','금','토'];
+
+    const DEFAULT_LOCS = [
+      { name: '구로3동', lat: 37.4954, lon: 126.8874 },
+      { name: '신갈동',  lat: 37.2742, lon: 127.1166 },
+    ];
+
+    function loadLocs() {
+      try { const s = localStorage.getItem('eink_locs'); if (s) return JSON.parse(s); } catch(e) {}
+      return DEFAULT_LOCS.map(l => ({...l}));
+    }
+    function saveLocs() { localStorage.setItem('eink_locs', JSON.stringify(locs)); }
+
+    let locs = loadLocs();
+    let weeklyLocIdx = parseInt(localStorage.getItem('eink_wloc') || '0');
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+
+    /* ── 색상 모드 ── */
+    function getInitialMode() { const h = new Date().getHours(); return (h >= 7 && h < 18) ? 'light' : 'dark'; }
+    let currentMode = getInitialMode();
+    const invertBtn = document.getElementById('invert-btn');
+    const invertIcon = invertBtn.querySelector('.material-symbols-outlined');
+
+    function applyMode(mode) {
+      currentMode = mode;
+      document.body.classList.toggle('light', mode === 'light');
+      invertIcon.textContent = mode === 'light' ? 'dark_mode' : 'light_mode';
+    }
+    applyMode(currentMode);
+
+    invertBtn.addEventListener('click', e => { e.stopPropagation(); applyMode(currentMode === 'light' ? 'dark' : 'light'); });
+    invertBtn.addEventListener('touchend', e => e.stopPropagation());
+
+    /* ── 디지털/아날로그 모드 ── */
+    let clockMode = localStorage.getItem('eink_cmode') || 'digital';
+    const modeBtn  = document.getElementById('mode-btn');
+    const modeIcon = modeBtn.querySelector('.material-symbols-outlined');
+
+    function applyClockMode(mode) {
+      clockMode = mode;
+      localStorage.setItem('eink_cmode', mode);
+      document.body.classList.toggle('analog', mode === 'analog');
+      if (mode === 'digital') document.body.classList.remove('analog-rect', 'analog-fullscreen');
+      modeIcon.textContent = mode === 'analog' ? 'tag' : 'schedule';
+      if (mode === 'analog') startAnalog();
+    }
+
+    modeBtn.addEventListener('click', e => { e.stopPropagation(); applyClockMode(clockMode === 'digital' ? 'analog' : 'digital'); });
+    modeBtn.addEventListener('touchend', e => e.stopPropagation());
+
+    /* ── 더블탭 전체화면 ── */
+    let lastTap = 0;
+    document.addEventListener('touchend', () => {
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+        else document.exitFullscreen().catch(()=>{});
+      }
+      lastTap = now;
+    });
+
+    /* ── 디지털 시계 ── */
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock-h').textContent = pad(now.getHours());
+      const ss = pad(now.getSeconds());
+      document.getElementById('clock-s').innerHTML = `<span>${ss[0]}</span><span>${ss[1]}</span>`;
+      document.getElementById('clock-m').textContent = pad(now.getMinutes());
+      document.getElementById('date').textContent    = `${now.getFullYear()} . ${pad(now.getMonth()+1)} . ${pad(now.getDate())}`;
+      document.getElementById('day').textContent     = DAYS_FULL[now.getDay()];
+    }
+
+    /* ── 아날로그 시계 ── */
+    const canvas = document.getElementById('analog-clock');
+    const ctx    = canvas.getContext('2d');
+    let analogRaf   = null;
+    let analogState = parseInt(localStorage.getItem('eink_astate') || '0');
+
+    function getTickState()   { return analogState % 4; }
+    function getClockShape()  { return analogState < 5 ? 'circle' : analogState < 8 ? 'rect' : 'fullscreen'; }
+    function isTickDots()     { return analogState === 4 || analogState === 6 || analogState === 7 || analogState === 10 || analogState === 11; }
+    function isTickUniform()  { return analogState === 7 || analogState === 8 || analogState === 11; }
+
+    // 둘레를 따라 균등 분할한 점 (t∈[0,1), 12시 방향에서 시계 방향)
+    function getRectPerimeterPoint(t, hw, hh, cr) {
+      const sw = hw - cr, sh = hh - cr;
+      const al = (Math.PI / 2) * cr;
+      const segs = [sw, al, 2*sh, al, 2*sw, al, 2*sh, al, sw];
+      const total = segs.reduce((a, b) => a + b, 0);
+      let s = ((t % 1) + 1) % 1 * total;
+      for (let i = 0; i < segs.length; i++) {
+        if (s < segs[i] + 1e-9) {
+          const f = segs[i] > 0 ? s / segs[i] : 0;
+          switch (i) {
+            case 0: return { x: f*sw,             y: -hh };
+            case 1: { const a = -Math.PI/2 + f*Math.PI/2;
+                      return { x: sw+cr*Math.cos(a), y: -sh+cr*Math.sin(a) }; }
+            case 2: return { x: hw,                y: -sh+f*2*sh };
+            case 3: { const a = f*Math.PI/2;
+                      return { x: sw+cr*Math.cos(a), y: sh+cr*Math.sin(a) }; }
+            case 4: return { x: sw-f*2*sw,         y: hh };
+            case 5: { const a = Math.PI/2+f*Math.PI/2;
+                      return { x: -sw+cr*Math.cos(a), y: sh+cr*Math.sin(a) }; }
+            case 6: return { x: -hw,               y: sh-f*2*sh };
+            case 7: { const a = Math.PI+f*Math.PI/2;
+                      return { x: -sw+cr*Math.cos(a), y: -sh+cr*Math.sin(a) }; }
+            case 8: return { x: -sw+f*sw,          y: -hh };
+          }
+        }
+        s -= segs[i];
+      }
+      return { x: 0, y: -hh };
+    }
+
+    function setupCanvas() {
+      if (getClockShape() === 'circle') {
+        const size = Math.min(window.innerWidth, window.innerHeight) * 0.88;
+        canvas.width = canvas.height = size;
+        canvas.style.width = canvas.style.height = size + 'px';
+        document.body.classList.remove('analog-rect', 'analog-fullscreen');
+      } else if (getClockShape() === 'rect') {
+        const w = Math.round(window.innerWidth  * 0.86);
+        const h = Math.round(window.innerHeight * 0.78);
+        canvas.width  = w; canvas.height = h;
+        canvas.style.width  = w + 'px';
+        canvas.style.height = h + 'px';
+        document.body.classList.add('analog-rect');
+        document.body.classList.remove('analog-fullscreen');
+      } else {
+        canvas.width  = window.innerWidth;
+        canvas.height = window.innerHeight;
+        canvas.style.width  = window.innerWidth + 'px';
+        canvas.style.height = window.innerHeight + 'px';
+        document.body.classList.remove('analog-rect');
+        document.body.classList.add('analog-fullscreen');
+      }
+    }
+
+    // 라운드 사각형 경계 교차점 (중심 기준 상대 좌표, cr = 코너 반지름)
+    function getRectBorderPoint(angle, hw, hh, cr) {
+      const cos = Math.cos(angle), sin = Math.sin(angle);
+      const ax = Math.abs(cos), ay = Math.abs(sin);
+      // 직선 변 교차 확인
+      if (ax > 1e-9) {
+        const t = hw / ax, y = sin * t;
+        if (Math.abs(y) <= hh - cr) return { x: cos > 0 ? hw : -hw, y };
+      }
+      if (ay > 1e-9) {
+        const t = hh / ay, x = cos * t;
+        if (Math.abs(x) <= hw - cr) return { x, y: sin > 0 ? hh : -hh };
+      }
+      // 코너 호 교차 (같은 사분면의 코너 중심)
+      const ccX = cos > 0 ? hw - cr : -(hw - cr);
+      const ccY = sin > 0 ? hh - cr : -(hh - cr);
+      const b   = cos * ccX + sin * ccY;
+      const disc = b * b - (ccX * ccX + ccY * ccY - cr * cr);
+      if (disc >= 0) {
+        const t = b + Math.sqrt(disc);
+        if (t > 0) return { x: t * cos, y: t * sin };
+      }
+      // fallback
+      const t = Math.min(hw / (ax || 1e-9), hh / (ay || 1e-9));
+      return { x: cos * t, y: sin * t };
+    }
+
+    function drawRoundedRectBorder(W, H, color, lw) {
+      const pad = Math.min(W, H) * 0.04;
+      const rx = pad, ry = pad, rw = W - pad * 2, rh = H - pad * 2;
+      const r  = Math.min(W, H) * 0.08;
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth   = lw;
+      ctx.beginPath();
+      ctx.moveTo(rx + r, ry);
+      ctx.lineTo(rx + rw - r, ry);
+      ctx.arcTo(rx + rw, ry,      rx + rw, ry + r,      r);
+      ctx.lineTo(rx + rw, ry + rh - r);
+      ctx.arcTo(rx + rw, ry + rh, rx + rw - r, ry + rh, r);
+      ctx.lineTo(rx + r, ry + rh);
+      ctx.arcTo(rx,      ry + rh, rx, ry + rh - r,      r);
+      ctx.lineTo(rx, ry + r);
+      ctx.arcTo(rx,      ry,      rx + r, ry,            r);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // 경계 위 점의 안쪽 법선 (수직 변 → 축 방향, 코너 → 방사형)
+    function getEdgeNormal(bp, hw, hh, tol) {
+      if (Math.abs(bp.y + hh) < tol) return { nx: 0,  ny: 1  }; // 상단 변
+      if (Math.abs(bp.y - hh) < tol) return { nx: 0,  ny: -1 }; // 하단 변
+      if (Math.abs(bp.x - hw) < tol) return { nx: -1, ny: 0  }; // 우측 변
+      if (Math.abs(bp.x + hw) < tol) return { nx: 1,  ny: 0  }; // 좌측 변
+      const len = Math.sqrt(bp.x * bp.x + bp.y * bp.y) || 1;
+      return { nx: -bp.x / len, ny: -bp.y / len };              // 코너: 방사형
+    }
+
+    function drawTicks(W, H, cx, cy, r, color) {
+      const ts    = getTickState();
+      const shape = getClockShape();
+      const isRect       = shape === 'rect';
+      const isFullscreen = shape === 'fullscreen';
+      const isDots       = isTickDots();
+      const thick        = Math.min(W, H);
+      const all60        = Array.from({length: 60}, (_, i) => i);
+
+      if (!isRect && !isFullscreen && !isDots && ts === 0) return;
+
+      // ── rect 균등 점 눈금 ──
+      if (isTickUniform() && isRect) {
+        const pad = thick * 0.09, cr = thick * 0.08, inset = thick * 0.018;
+        const hw  = W / 2 - pad - inset, hh = H / 2 - pad - inset;
+        const dcr = Math.max(cr - inset, 0);
+        for (let i = 0; i < 60; i++) {
+          const isHour = i % 5 === 0;
+          const bp     = getRectPerimeterPoint(i / 60, hw, hh, dcr);
+          ctx.save();
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(cx + bp.x, cy + bp.y, isHour ? thick * 0.013 : thick * 0.007, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        return;
+      }
+
+      // ── fullscreen 균등 점 눈금 ──
+      if (isTickUniform() && isFullscreen && isDots) {
+        const cr = thick * 0.02, inset = thick * 0.025;
+        const hw = W / 2 - inset, hh = H / 2 - inset;
+        const dcr = Math.max(cr - inset, 0);
+        for (let i = 0; i < 60; i++) {
+          const isHour = i % 5 === 0;
+          const bp     = getRectPerimeterPoint(i / 60, hw, hh, dcr);
+          ctx.save();
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(cx + bp.x, cy + bp.y, isHour ? thick * 0.013 : thick * 0.007, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        return;
+      }
+
+      // ── 균등 간격 선 눈금 ──
+      if (isTickUniform() && isFullscreen) {
+        const pad = 0, cr = thick * 0.02;
+        const hw  = W / 2 - pad, hh = H / 2 - pad;
+        for (let i = 0; i < 60; i++) {
+          const isHour = i % 5 === 0;
+          const bp     = getRectPerimeterPoint(i / 60, hw, hh, cr);
+          const tol    = thick * 0.015;
+          const norm   = getEdgeNormal(bp, hw, hh, tol);
+          const tickLen = isHour ? thick * 0.07 : thick * 0.035;
+          ctx.save();
+          ctx.strokeStyle = color;
+          ctx.lineWidth   = isHour ? thick * 0.012 : thick * 0.004;
+          ctx.lineCap     = 'round';
+          ctx.beginPath();
+          ctx.moveTo(cx + bp.x, cy + bp.y);
+          ctx.lineTo(cx + bp.x + norm.nx * tickLen, cy + bp.y + norm.ny * tickLen);
+          ctx.stroke();
+          ctx.restore();
+        }
+        return;
+      }
+
+      // ── 점 눈금 ──
+      if (isDots) {
+        all60.forEach(i => {
+          const isHour = i % 5 === 0;
+          const angle  = (i / 60) * Math.PI * 2 - Math.PI / 2;
+          const dotR   = isHour ? thick * 0.013 : thick * 0.007;
+          ctx.save();
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          if (isRect || isFullscreen) {
+            const pad   = isFullscreen ? 0 : thick * 0.09;
+            const cr    = isFullscreen ? thick * 0.02 : thick * 0.08;
+            const inset = isFullscreen ? thick * 0.025 : thick * 0.018;
+            // 안쪽으로 inset만큼 줄인 사각형의 경계점 = 모든 점 중심이 균일
+            const hw  = W / 2 - pad - inset, hh = H / 2 - pad - inset;
+            const dcr = Math.max(cr - inset, 0);
+            const bp  = getRectBorderPoint(angle, hw, hh, dcr);
+            ctx.arc(cx + bp.x, cy + bp.y, dotR, 0, Math.PI * 2);
+          } else {
+            ctx.arc(cx + Math.cos(angle) * r * 0.88, cy + Math.sin(angle) * r * 0.88, dotR, 0, Math.PI * 2);
+          }
+          ctx.fill();
+          ctx.restore();
+        });
+        return;
+      }
+
+      // ── 선 눈금 ──
+      const positions = (isRect || isFullscreen) ? all60
+        : ts === 1 ? [2,4,8,10]
+        : ts === 2 ? [0,1,2,3,4,5,6,7,8,9,10,11]
+        : all60;
+      const total = positions.length;
+      positions.forEach(i => {
+        const isHour  = total === 60 ? i % 5 === 0 : true;
+        const divisor = total === 60 ? 60 : 12;
+        const angle   = (i / divisor) * Math.PI * 2 - Math.PI / 2;
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth   = isHour ? thick * 0.012 : thick * 0.004;
+        ctx.lineCap     = 'round';
+        ctx.beginPath();
+        if (isRect || isFullscreen) {
+          const pad     = isFullscreen ? 0 : thick * 0.09;
+          const cr      = isFullscreen ? thick * 0.02 : thick * 0.08;
+          const hw      = W / 2 - pad, hh = H / 2 - pad;
+          const bp      = getRectBorderPoint(angle, hw, hh, cr);
+          const baseLen = isHour ? thick * 0.07 : thick * 0.035;
+          const tol     = thick * 0.015;
+          const norm    = getEdgeNormal(bp, hw, hh, tol);
+          const cosDot  = Math.abs(-Math.cos(angle) * norm.nx + (-Math.sin(angle)) * norm.ny);
+          const tickLen = baseLen / Math.max(cosDot, 0.25);
+          ctx.moveTo(cx + bp.x, cy + bp.y);
+          ctx.lineTo(cx + bp.x - Math.cos(angle) * tickLen, cy + bp.y - Math.sin(angle) * tickLen);
+        } else {
+          const oR = r * 0.93;
+          const iR = (ts === 1 || isHour) ? r * 0.76 : r * 0.87;
+          ctx.moveTo(cx + Math.cos(angle) * oR, cy + Math.sin(angle) * oR);
+          ctx.lineTo(cx + Math.cos(angle) * iR, cy + Math.sin(angle) * iR);
+        }
+        ctx.stroke();
+        ctx.restore();
+      });
+    }
+
+    function drawAnalog() {
+      const now = new Date();
+      const s   = now.getSeconds();
+      const m   = now.getMinutes();
+      const h   = (now.getHours() % 12) + m / 60;
+
+      const W      = canvas.width, H = canvas.height;
+      const cx     = W / 2, cy = H / 2;
+      const minDim = Math.min(W, H);
+      const r      = minDim / 2;
+      const color  = currentMode === 'light' ? '#000' : '#fff';
+
+      ctx.clearRect(0, 0, W, H);
+
+      drawTicks(W, H, cx, cy, r, color);
+
+      // 3시 방향 날짜 창
+      const dateNum = now.getDate();
+      const dw = minDim * 0.13, dh = minDim * 0.09;
+      const dx = cx + minDim * 0.26,  dy = cy;
+      const bg = currentMode === 'light' ? '#fff' : '#000';
+      ctx.save();
+      ctx.fillStyle = bg;
+      ctx.fillRect(dx - dw/2, dy - dh/2, dw, dh);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = minDim * 0.005;
+      ctx.strokeRect(dx - dw/2, dy - dh/2, dw, dh);
+      ctx.fillStyle = color;
+      ctx.font = `bold ${minDim * 0.065}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(dateNum), dx, dy + dh * 0.08);
+      ctx.restore();
+
+      // 바늘: rotate(angle), 기본 방향 = 12시 방향(위)
+      function hand(angle, length, width) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+        ctx.strokeStyle = color;
+        ctx.lineWidth   = width;
+        ctx.lineCap     = 'round';
+        ctx.beginPath();
+        ctx.moveTo(0, length * 0.12);
+        ctx.lineTo(0, -length);
+        ctx.stroke();
+        ctx.restore();
+      }
+      // 속이 빈 시침 (원래 선 모양 유지, 두 번 겹쳐 hollow 효과)
+      function hollowHand(angle, length, width) {
+        const bg = currentMode === 'light' ? '#fff' : '#000';
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(0, length * 0.12);
+        ctx.lineTo(0, -length);
+        ctx.strokeStyle = color;
+        ctx.lineWidth   = width;
+        ctx.stroke();
+        ctx.strokeStyle = bg;
+        ctx.lineWidth   = width * 0.28;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      if (getClockShape() === 'rect') {
+        // rect 모드: 짧은 변 기준으로 원래 비율 적용
+        const pad  = minDim * 0.09;
+        const sr   = Math.min(W / 2 - pad, H / 2 - pad);
+        hollowHand(h * (Math.PI * 2 / 12), sr * 0.62, minDim * 0.030); // 시침
+        hand(m * (Math.PI * 2 / 60), sr * 0.86, minDim * 0.018); // 분침
+        hand(s * (Math.PI * 2 / 60), sr * 0.92, minDim * 0.008); // 초침
+      } else if (getClockShape() === 'fullscreen') {
+        // fullscreen 모드: 화면 짧은 변 기준
+        const sr = minDim / 2;
+        hollowHand(h * (Math.PI * 2 / 12), sr * 0.62, minDim * 0.030); // 시침
+        hand(m * (Math.PI * 2 / 60), sr * 0.86, minDim * 0.018); // 분침
+        hand(s * (Math.PI * 2 / 60), sr * 0.92, minDim * 0.008); // 초침
+      } else {
+        hollowHand(h * (Math.PI * 2 / 12), minDim * 0.31, minDim * 0.030); // 시침
+        hand(m * (Math.PI * 2 / 60), minDim * 0.43, minDim * 0.018); // 분침
+        hand(s * (Math.PI * 2 / 60), minDim * 0.46, minDim * 0.008); // 초침 (1초 단위)
+      }
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, minDim * 0.018, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+
+    function startAnalog() {
+      setupCanvas();
+      if (analogRaf) cancelAnimationFrame(analogRaf);
+      function loop() {
+        if (clockMode === 'analog') { drawAnalog(); analogRaf = requestAnimationFrame(loop); }
+      }
+      loop();
+    }
+
+    canvas.addEventListener('touchend', e => {
+      e.stopPropagation();
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        // 첫 탭의 모드 변경 취소
+        analogState = (analogState - 1 + 12) % 12;
+        localStorage.setItem('eink_astate', analogState);
+        setupCanvas();
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+        else document.exitFullscreen().catch(()=>{});
+        lastTap = 0;
+        return;
+      }
+      lastTap = now;
+      analogState = (analogState + 1) % 12;
+      localStorage.setItem('eink_astate', analogState);
+      setupCanvas();
+    });
+
+    window.addEventListener('resize', () => { if (clockMode === 'analog') setupCanvas(); });
+
+    /* ── 날씨 코드 ── */
+    function weatherCodeToInfo(code) {
+      if (code === 0) return { icon: 'wb_sunny',           desc: '맑음' };
+      if (code <= 2)  return { icon: 'partly_cloudy_day',  desc: '구름 조금' };
+      if (code === 3) return { icon: 'cloud',               desc: '흐림' };
+      if (code <= 49) return { icon: 'foggy',               desc: '안개' };
+      if (code <= 59) return { icon: 'rainy',               desc: '이슬비' };
+      if (code <= 69) return { icon: 'rainy',               desc: '비' };
+      if (code <= 79) return { icon: 'weather_snowy',       desc: '눈' };
+      if (code <= 82) return { icon: 'grain',               desc: '소나기' };
+      if (code <= 86) return { icon: 'ac_unit',             desc: '눈보라' };
+      if (code <= 99) return { icon: 'thunderstorm',        desc: '뇌우' };
+      return { icon: 'question_mark', desc: '알 수 없음' };
+    }
+
+    /* ── 현재 날씨 ── */
+    async function fetchWeatherFor(idx) {
+      const { lat, lon, name } = locs[idx];
+      const col = document.getElementById(`w${idx}`);
+      col.querySelector('.w-name').textContent = name;
+      col.querySelector('.w-desc').textContent = '로딩중';
+      try {
+        const res  = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+          `&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m` +
+          `&wind_speed_unit=kmh&timezone=Asia%2FSeoul`
+        );
+        const data = await res.json();
+        const cur  = data.current;
+        const { icon, desc } = weatherCodeToInfo(cur.weather_code);
+        col.querySelector('.w-icon').textContent   = icon;
+        col.querySelector('.w-temp').textContent   = `${Math.round(cur.temperature_2m)}°`;
+        col.querySelector('.w-desc').textContent   = desc;
+        col.querySelector('.w-detail').textContent =
+          `체감${Math.round(cur.apparent_temperature)}° 습도${cur.relative_humidity_2m}% 풍량${Math.round(cur.wind_speed_10m)}`;
+      } catch(e) { col.querySelector('.w-desc').textContent = '오류'; }
+    }
+
+    function fetchAllWeather() {
+      locs.forEach((_, i) => fetchWeatherFor(i));
+      setTimeout(fetchAllWeather, 10 * 60 * 1000);
+    }
+
+    /* ── 주간 날씨 ── */
+    function renderWeeklyPlaceholder() {
+      const row = document.getElementById('weekly-row');
+      row.innerHTML = '';
+      for (let i = 0; i < 7; i++) {
+        const col = document.createElement('div');
+        col.className = 'day-col'; col.id = `wd${i}`;
+        col.innerHTML = `<div class="day-name">--</div><span class="day-icon material-symbols-outlined">wb_sunny</span><div class="day-max">--°</div><div class="day-min">--°</div>`;
+        row.appendChild(col);
+      }
+    }
+
+    async function fetchWeekly(idx) {
+      weeklyLocIdx = idx;
+      localStorage.setItem('eink_wloc', idx);
+      updateWeeklyIndicator();
+      const { lat, lon } = locs[idx];
+      try {
+        const res  = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+          `&daily=weather_code,temperature_2m_max,temperature_2m_min` +
+          `&forecast_days=7&timezone=Asia%2FSeoul`
+        );
+        const data = await res.json();
+        const { time, weather_code, temperature_2m_max, temperature_2m_min } = data.daily;
+        const todayStr = new Date().toISOString().slice(0, 10);
+        time.forEach((dateStr, i) => {
+          const col = document.getElementById(`wd${i}`);
+          if (!col) return;
+          const dow = new Date(dateStr + 'T12:00:00').getDay();
+          const { icon } = weatherCodeToInfo(weather_code[i]);
+          const isToday  = dateStr === todayStr;
+          col.className  = 'day-col';
+          col.querySelector('.day-name').textContent = isToday ? '오늘' : DAYS_SHORT[dow];
+          col.querySelector('.day-icon').textContent = icon;
+          col.querySelector('.day-max').textContent  = `${Math.round(temperature_2m_max[i])}°`;
+          col.querySelector('.day-min').textContent  = `${Math.round(temperature_2m_min[i])}°`;
+        });
+      } catch(e) {
+        document.querySelectorAll('.day-col').forEach(c => { c.querySelector('.day-name').textContent = '--'; });
+      }
+    }
+
+    function updateWeeklyIndicator() {
+      document.querySelectorAll('.weather-col').forEach((col, i) => {
+        col.classList.toggle('weekly-active', i === weeklyLocIdx);
+      });
+    }
+
+    document.querySelectorAll('.weather-col').forEach((col, i) => {
+      col.addEventListener('click', e => {
+        if (e.target.classList.contains('w-name')) return;
+        e.stopPropagation();
+        if (i !== weeklyLocIdx) fetchWeekly(i);
+      });
+    });
+
+    /* ── 위치 검색 모달 ── */
+    let editingIdx = -1;
+    const modal        = document.getElementById('modal');
+    const modalInput   = document.getElementById('modal-input');
+    const modalBtn     = document.getElementById('modal-btn');
+    const modalStatus  = document.getElementById('modal-status');
+    const modalResults = document.getElementById('modal-results');
+    const modalClose   = document.getElementById('modal-close');
+
+    document.querySelectorAll('.w-name').forEach(el => {
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        editingIdx = parseInt(el.dataset.idx);
+        modalInput.value = ''; modalStatus.textContent = ''; modalResults.innerHTML = '';
+        modal.classList.add('open');
+        setTimeout(() => modalInput.focus(), 100);
+      });
+    });
+
+    modalClose.addEventListener('click', () => modal.classList.remove('open'));
+
+    async function doSearch() {
+      const q = modalInput.value.trim();
+      if (!q) return;
+      modalStatus.textContent = '검색중...'; modalResults.innerHTML = '';
+      try {
+        const res   = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=6&accept-language=ko&countrycodes=kr`
+        );
+        const items = await res.json();
+        if (!items.length) { modalStatus.textContent = '결과 없음'; return; }
+        modalStatus.textContent = `${items.length}개 결과`;
+        items.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'result-item';
+          const short = item.display_name.split(',').slice(0, 3).join(', ');
+          div.textContent = short;
+          div.addEventListener('click', () => {
+            locs[editingIdx] = { name: item.name || short, lat: parseFloat(item.lat), lon: parseFloat(item.lon) };
+            saveLocs(); modal.classList.remove('open');
+            fetchWeatherFor(editingIdx); fetchWeekly(weeklyLocIdx);
+          });
+          modalResults.appendChild(div);
+        });
+      } catch(e) { modalStatus.textContent = '검색 오류'; }
+    }
+
+    modalBtn.addEventListener('click', doSearch);
+    modalInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+    /* ── 달력 ── */
+    const calOverlay = document.getElementById('cal-overlay');
+    const calGrid    = document.getElementById('cal-grid');
+    const calTitle   = document.getElementById('cal-title');
+    let calYear, calMonth;
+
+    function renderCalendar() {
+      const today = new Date();
+      const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+      calTitle.textContent = `${calYear}년 ${months[calMonth]}`;
+      const firstDay    = new Date(calYear, calMonth, 1).getDay();
+      const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+      calGrid.innerHTML = '';
+      for (let i = 0; i < firstDay; i++) {
+        const c = document.createElement('div'); c.className = 'cal-cell empty';
+        calGrid.appendChild(c);
+      }
+      for (let d = 1; d <= daysInMonth; d++) {
+        const dow = (firstDay + d - 1) % 7;
+        const c = document.createElement('div');
+        c.className = 'cal-cell' + (dow === 0 ? ' sunday' : dow === 6 ? ' saturday' : '');
+        if (calYear === today.getFullYear() && calMonth === today.getMonth() && d === today.getDate())
+          c.classList.add('today');
+        c.textContent = d;
+        calGrid.appendChild(c);
+      }
+    }
+
+    const weatherEls = () => [
+      document.getElementById('weather-row'),
+      document.getElementById('weekly-section'),
+      ...document.querySelectorAll('.divider')
+    ];
+    function openCal() {
+      const today = new Date();
+      calYear = today.getFullYear(); calMonth = today.getMonth();
+      renderCalendar();
+      weatherEls().forEach(el => el.style.display = 'none');
+      calOverlay.classList.add('open');
+    }
+    function closeCal() {
+      weatherEls().forEach(el => el.style.display = '');
+      calOverlay.classList.remove('open');
+    }
+    document.getElementById('date').addEventListener('touchend', e => {
+      e.stopPropagation();
+      calOverlay.classList.contains('open') ? closeCal() : openCal();
+    });
+    document.getElementById('cal-prev').addEventListener('click', e => {
+      e.stopPropagation();
+      if (--calMonth < 0) { calMonth = 11; calYear--; }
+      renderCalendar();
+    });
+    document.getElementById('cal-next').addEventListener('click', e => {
+      e.stopPropagation();
+      if (++calMonth > 11) { calMonth = 0; calYear++; }
+      renderCalendar();
+    });
+
+    /* ── 도움말 ── */
+    const helpOverlay = document.getElementById('help-overlay');
+    document.getElementById('help-btn').addEventListener('click', () => helpOverlay.classList.toggle('open'));
+    document.getElementById('help-close').addEventListener('click', () => helpOverlay.classList.remove('open'));
+
+    /* ── 시작 ── */
+    applyClockMode(clockMode);
+    updateClock();
+    setInterval(updateClock, 1000);
+    renderWeeklyPlaceholder();
+    fetchAllWeather();
+    fetchWeekly(weeklyLocIdx);
+    setInterval(() => fetchWeekly(weeklyLocIdx), 60 * 60 * 1000);
+  </script>
+</body>
+</html>
