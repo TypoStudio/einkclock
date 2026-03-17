@@ -1,5 +1,7 @@
 <div align="center">
     <h1>E-Ink Clock</h1>
+    <img src="screenshots/clock1.jpeg" width="260">
+    <img src="screenshots/clock3.jpeg" width="260">
 </div>
 
 A web-based clock optimized for e-ink displays and e-readers. Supports digital and analog modes with live weather and a built-in calendar — all in a single HTML file, no installation required.
@@ -26,6 +28,9 @@ Open `index.html` in any browser or e-reader's built-in browser. No server or bu
 - Data from [Open-Meteo](https://open-meteo.com/) — no API key required
 
 ### Calendar
+
+<img src="screenshots/clock2.jpeg" width="220">
+
 - Tap the date to open a monthly calendar
 - Navigate months with ‹ / › buttons
 - Tap the date again to return to weather view
