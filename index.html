@@ -199,6 +199,7 @@
       <ul>
         <li>시계를 한 번 터치하면 눈금 스타일이 순서대로 바뀝니다.</li>
         <li>시계를 두 번 연속 터치하면 전체화면으로 전환됩니다.</li>
+        <li>시계 <strong>중앙</strong>을 터치하면 바늘 구성이 바뀝니다.<br>시분초침 → 시분침 → 시침 (눈금까지)</li>
       </ul>
       <div class="row"><span class="label">0 — 원형</span><span>눈금 없음</span></div>
       <div class="row"><span class="label">1 — 원형</span><span>4분할 눈금</span></div>
@@ -216,7 +217,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.1</div>
+        <div>v1.1.2</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -365,7 +366,9 @@
     let ctx      = canvas.getContext('2d');
     let analogInterval  = null;
     let offscreenCanvas = null, offCtx = null, staticLayerKey = null;
+    let handsOffscreen  = null, handsOffCtx = null, handsLayerKey = null;
     let analogState = parseInt(localStorage.getItem('eink_astate') || '0');
+    let handMode    = parseInt(localStorage.getItem('eink_hmode')  || '0'); // 0:시분초침 1:시분침 2:시침
 
     function getTickState()   { return analogState % 4; }
     function getClockShape()  { return analogState < 5 ? 'circle' : analogState < 8 ? 'rect' : 'fullscreen'; }
@@ -430,6 +433,11 @@
       offscreenCanvas.height = canvas.height;
       offCtx = offscreenCanvas.getContext('2d');
       staticLayerKey = null; // 크기·모양 바뀌면 정적 레이어 재생성
+      handsOffscreen = document.createElement('canvas');
+      handsOffscreen.width  = canvas.width;
+      handsOffscreen.height = canvas.height;
+      handsOffCtx = handsOffscreen.getContext('2d');
+      handsLayerKey = null; // 크기·모양 바뀌면 바늘 레이어 재생성
     }
 
     // 라운드 사각형 경계 교차점 (중심 기준 상대 좌표, cr = 코너 반지름)
@@ -656,26 +664,13 @@
       staticLayerKey = currentMode + ':' + dateNum;
     }
 
-    function drawAnalog() {
-      const now = new Date();
-      const s   = now.getSeconds();
-      const m   = now.getMinutes();
-      const h   = (now.getHours() % 12) + m / 60;
-
-      const W      = canvas.width, H = canvas.height;
-      const cx     = W / 2, cy = H / 2;
+    // 시침·분침을 handsOffscreen에 캐시 (분 바뀔 때만 재생성)
+    function drawHandsLayer(W, H, cx, cy, color, h, m) {
+      const mainCtx = ctx;
+      ctx = handsOffCtx;
+      handsOffCtx.clearRect(0, 0, W, H);
       const minDim = Math.min(W, H);
-      const r      = minDim / 2;
-      const color  = currentMode === 'light' ? '#000' : '#fff';
 
-      // 테마·날짜 변경 시에만 정적 레이어 재생성
-      const key = currentMode + ':' + now.getDate();
-      if (staticLayerKey !== key) drawStaticLayer(W, H, cx, cy, r, color);
-
-      ctx.clearRect(0, 0, W, H);
-      ctx.drawImage(offscreenCanvas, 0, 0);
-
-      // 바늘: rotate(angle), 기본 방향 = 12시 방향(위)
       function hand(angle, length, width) {
         ctx.save();
         ctx.translate(cx, cy);
@@ -689,7 +684,6 @@
         ctx.stroke();
         ctx.restore();
       }
-      // 속이 빈 시침 (원래 선 모양 유지, 두 번 겹쳐 hollow 효과)
       function hollowHand(angle, length, width) {
         const bg = currentMode === 'light' ? '#fff' : '#000';
         ctx.save();
@@ -709,28 +703,77 @@
       }
 
       if (getClockShape() === 'rect') {
-        // rect 모드: 짧은 변 기준으로 원래 비율 적용
-        const pad  = minDim * 0.09;
-        const sr   = Math.min(W / 2 - pad, H / 2 - pad);
-        hollowHand(h * (Math.PI * 2 / 12), sr * 0.62, minDim * 0.030); // 시침
-        hand(m * (Math.PI * 2 / 60), sr * 0.86, minDim * 0.018); // 분침
-        hand(s * (Math.PI * 2 / 60), sr * 0.92, minDim * 0.008); // 초침
+        const pad = minDim * 0.09;
+        const sr  = Math.min(W / 2 - pad, H / 2 - pad);
+        hollowHand(h * (Math.PI * 2 / 12), handMode === 2 ? sr * 0.90 : sr * 0.62, minDim * 0.030);
+        if (handMode < 2) hand(m * (Math.PI * 2 / 60), sr * 0.86, minDim * 0.018);
       } else if (getClockShape() === 'fullscreen') {
-        // fullscreen 모드: 화면 짧은 변 기준
         const sr = minDim / 2;
-        hollowHand(h * (Math.PI * 2 / 12), sr * 0.62, minDim * 0.030); // 시침
-        hand(m * (Math.PI * 2 / 60), sr * 0.86, minDim * 0.018); // 분침
-        hand(s * (Math.PI * 2 / 60), sr * 0.92, minDim * 0.008); // 초침
+        hollowHand(h * (Math.PI * 2 / 12), handMode === 2 ? sr * 0.90 : sr * 0.62, minDim * 0.030);
+        if (handMode < 2) hand(m * (Math.PI * 2 / 60), sr * 0.86, minDim * 0.018);
       } else {
-        hollowHand(h * (Math.PI * 2 / 12), minDim * 0.31, minDim * 0.030); // 시침
-        hand(m * (Math.PI * 2 / 60), minDim * 0.43, minDim * 0.018); // 분침
-        hand(s * (Math.PI * 2 / 60), minDim * 0.46, minDim * 0.008); // 초침 (1초 단위)
+        hollowHand(h * (Math.PI * 2 / 12), handMode === 2 ? minDim * 0.45 : minDim * 0.31, minDim * 0.030);
+        if (handMode < 2) hand(m * (Math.PI * 2 / 60), minDim * 0.43, minDim * 0.018);
       }
 
+      // 중심점
       ctx.beginPath();
       ctx.arc(cx, cy, minDim * 0.018, 0, Math.PI * 2);
       ctx.fillStyle = color;
       ctx.fill();
+
+      ctx = mainCtx;
+    }
+
+    function drawAnalog() {
+      const now = new Date();
+      const s   = now.getSeconds();
+      const m   = now.getMinutes();
+      const h   = (now.getHours() % 12) + m / 60;
+
+      const W      = canvas.width, H = canvas.height;
+      const cx     = W / 2, cy = H / 2;
+      const minDim = Math.min(W, H);
+      const r      = minDim / 2;
+      const color  = currentMode === 'light' ? '#000' : '#fff';
+
+      // 정적 레이어: 테마·날짜 변경 시에만 재생성
+      const staticKey = currentMode + ':' + now.getDate();
+      if (staticLayerKey !== staticKey) drawStaticLayer(W, H, cx, cy, r, color);
+
+      // 바늘 레이어: 분·handMode 변경 시에만 재생성
+      const hKey = now.getHours() + ':' + m + ':' + handMode;
+      if (handsLayerKey !== hKey) {
+        drawHandsLayer(W, H, cx, cy, color, h, m);
+        handsLayerKey = hKey;
+      }
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(offscreenCanvas, 0, 0); // 정적 레이어
+      ctx.drawImage(handsOffscreen, 0, 0);  // 바늘 레이어
+
+      // 초침: handMode 0일 때만 매초 직접 그림
+      if (handMode === 0) {
+        const angle = s * (Math.PI * 2 / 60);
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+        ctx.strokeStyle = color;
+        ctx.lineWidth   = minDim * 0.008;
+        ctx.lineCap     = 'round';
+        ctx.beginPath();
+        if (getClockShape() === 'rect') {
+          const sr = Math.min(W / 2 - minDim * 0.09, H / 2 - minDim * 0.09);
+          ctx.moveTo(0, sr * 0.92 * 0.12); ctx.lineTo(0, -sr * 0.92);
+        } else if (getClockShape() === 'fullscreen') {
+          const sr = minDim / 2;
+          ctx.moveTo(0, sr * 0.92 * 0.12); ctx.lineTo(0, -sr * 0.92);
+        } else {
+          ctx.moveTo(0, minDim * 0.46 * 0.12); ctx.lineTo(0, -minDim * 0.46);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
     }
 
     function startAnalog() {
@@ -745,12 +788,28 @@
 
     canvas.addEventListener('touchend', e => {
       e.stopPropagation();
+
+      // 중앙 탭 감지: 반경 12% 이내면 바늘 구성 순환
+      const t    = e.changedTouches[0];
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width  / rect.width;
+      const scaleY = canvas.height / rect.height;
+      const dx = (t.clientX - rect.left)  * scaleX - canvas.width  / 2;
+      const dy = (t.clientY - rect.top)   * scaleY - canvas.height / 2;
+      if (Math.sqrt(dx * dx + dy * dy) < Math.min(canvas.width, canvas.height) * 0.12) {
+        handMode = (handMode + 1) % 3;
+        localStorage.setItem('eink_hmode', handMode);
+        handsLayerKey = null;
+        drawAnalog();
+        return;
+      }
+
       const now = Date.now();
       if (now - lastTap < 300) {
         // 첫 탭의 모드 변경 취소
         analogState = (analogState - 1 + 12) % 12;
         localStorage.setItem('eink_astate', analogState);
-        setupCanvas();
+        setupCanvas(); drawAnalog();
         if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
         else document.exitFullscreen().catch(()=>{});
         lastTap = 0;
@@ -759,7 +818,7 @@
       lastTap = now;
       analogState = (analogState + 1) % 12;
       localStorage.setItem('eink_astate', analogState);
-      setupCanvas();
+      setupCanvas(); drawAnalog();
     });
 
     window.addEventListener('resize', () => { if (clockMode === 'analog') setupCanvas(); });
