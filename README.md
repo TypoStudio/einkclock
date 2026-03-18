@@ -18,6 +18,7 @@ Open `index.html` in any browser or e-reader's built-in browser. No server or bu
 ### Clock
 - Digital mode — large time display with date and day of week
 - Analog mode — 12 clock face styles (circle, rectangle, fullscreen)
+- Analog mode — tap the center to cycle hand configuration: hour+minute+second → hour+minute → hour only (extended to tick marks)
 - Double-tap anywhere to toggle fullscreen
 
 ### Weather
@@ -25,6 +26,7 @@ Open `index.html` in any browser or e-reader's built-in browser. No server or bu
 - Shows temperature, feels-like, humidity, and wind speed
 - 7-day forecast (switchable between locations)
 - Tap a location name to search and change it
+- Tap the weekly forecast area to refresh weather data immediately
 - Data from [Open-Meteo](https://open-meteo.com/) — no API key required
 
 ### Calendar
@@ -57,10 +59,11 @@ Open `index.html` in any browser or e-reader's built-in browser. No server or bu
 | Tap date | Open / close calendar |
 | Tap location name | Search and change location |
 | Tap ▼ under weather | Select weekly forecast location |
+| Tap weekly forecast area | Refresh weather data immediately |
 
 ### Analog Mode
 
-Single-tap the clock face to cycle through 12 styles. Double-tap to toggle fullscreen.
+Single-tap the clock face to cycle through 12 styles. Double-tap to toggle fullscreen. Tap the **center** to cycle hand configuration: hour+minute+second → hour+minute → hour only (extended to tick marks).
 
 | Style | Shape | Tick Type |
 |-------|-------|-----------|
@@ -103,10 +106,11 @@ E-Ink Clock is available under the [GNU General Public License v3.0](LICENSE).
 ### 주요 기능
 
 - **시계** — 디지털 모드(시각·날짜·요일 표시)와 아날로그 모드(12가지 페이스 스타일) 지원
-- **날씨** — 2개 지역의 현재 날씨 및 7일 예보, API 키 불필요
+- **아날로그 바늘** — 중앙 터치로 시분초침 → 시분침 → 시침(눈금까지) 순환
+- **날씨** — 2개 지역의 현재 날씨 및 7일 예보, API 키 불필요, 주간 예보 터치로 즉시 갱신
 - **달력** — 날짜를 터치해 월간 달력 열기, ‹ / › 로 월 이동
 - **화면 모드** — 다크/라이트 모드 전환, 더블탭 전체화면
-- **설정 저장** — 위치·모드·아날로그 스타일이 `localStorage`에 저장됨
+- **설정 저장** — 위치·모드·아날로그 스타일·바늘 구성이 `localStorage`에 저장됨
 
 ### 조작법
 
@@ -126,10 +130,11 @@ E-Ink Clock is available under the [GNU General Public License v3.0](LICENSE).
 | 날짜 터치 | 달력 열기 / 닫기 |
 | 지역명 터치 | 날씨 지역 검색 및 변경 |
 | 날씨 설명 아래 ▼ 터치 | 주간 예보 지역 선택 |
+| 주간 예보 영역 터치 | 날씨 즉시 갱신 |
 
 #### 아날로그 모드
 
-시계를 한 번 터치할 때마다 스타일이 순서대로 바뀝니다. 두 번 연속 터치하면 전체화면으로 전환됩니다.
+시계를 한 번 터치할 때마다 스타일이 순서대로 바뀝니다. 두 번 연속 터치하면 전체화면으로 전환됩니다. 시계 **중앙**을 터치하면 바늘 구성이 바뀝니다 — 시분초침 → 시분침 → 시침(눈금까지).
 
 | 번호 | 형태 | 눈금 |
 |------|------|------|
