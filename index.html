@@ -316,11 +316,14 @@
       currentMode = mode;
       document.body.classList.toggle('light', mode === 'light');
       invertIcon.textContent = mode === 'light' ? 'dark_mode' : 'light_mode';
-      if (clockMode === 'analog') { staticLayerKey = null; handsLayerKey = null; drawAnalog(); }
     }
     applyMode(currentMode);
 
-    invertBtn.addEventListener('click', e => { e.stopPropagation(); applyMode(currentMode === 'light' ? 'dark' : 'light'); });
+    invertBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      applyMode(currentMode === 'light' ? 'dark' : 'light');
+      if (clockMode === 'analog') { staticLayerKey = null; handsLayerKey = null; drawAnalog(); }
+    });
     invertBtn.addEventListener('touchend', e => e.stopPropagation());
 
     /* ── 디지털/아날로그 모드 ── */
