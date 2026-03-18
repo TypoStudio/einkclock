@@ -217,7 +217,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.2</div>
+        <div>v1.1.3</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -316,6 +316,7 @@
       currentMode = mode;
       document.body.classList.toggle('light', mode === 'light');
       invertIcon.textContent = mode === 'light' ? 'dark_mode' : 'light_mode';
+      if (clockMode === 'analog') { staticLayerKey = null; handsLayerKey = null; drawAnalog(); }
     }
     applyMode(currentMode);
 
