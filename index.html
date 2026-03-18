@@ -361,8 +361,9 @@
 
     /* ── 아날로그 시계 ── */
     const canvas = document.getElementById('analog-clock');
-    const ctx    = canvas.getContext('2d');
-    let analogRaf   = null;
+    let ctx      = canvas.getContext('2d');
+    let analogInterval  = null;
+    let offscreenCanvas = null, offCtx = null, staticLayerKey = null;
     let analogState = parseInt(localStorage.getItem('eink_astate') || '0');
 
     function getTickState()   { return analogState % 4; }
@@ -423,6 +424,11 @@
         document.body.classList.remove('analog-rect');
         document.body.classList.add('analog-fullscreen');
       }
+      offscreenCanvas = document.createElement('canvas');
+      offscreenCanvas.width  = canvas.width;
+      offscreenCanvas.height = canvas.height;
+      offCtx = offscreenCanvas.getContext('2d');
+      staticLayerKey = null; // 크기·모양 바뀌면 정적 레이어 재생성
     }
 
     // 라운드 사각형 경계 교차점 (중심 기준 상대 좌표, cr = 코너 반지름)
@@ -619,26 +625,18 @@
       });
     }
 
-    function drawAnalog() {
-      const now = new Date();
-      const s   = now.getSeconds();
-      const m   = now.getMinutes();
-      const h   = (now.getHours() % 12) + m / 60;
-
-      const W      = canvas.width, H = canvas.height;
-      const cx     = W / 2, cy = H / 2;
-      const minDim = Math.min(W, H);
-      const r      = minDim / 2;
-      const color  = currentMode === 'light' ? '#000' : '#fff';
-
-      ctx.clearRect(0, 0, W, H);
+    function drawStaticLayer(W, H, cx, cy, r, color) {
+      const mainCtx = ctx;
+      ctx = offCtx;
+      offCtx.clearRect(0, 0, W, H);
 
       drawTicks(W, H, cx, cy, r, color);
 
       // 3시 방향 날짜 창
-      const dateNum = now.getDate();
+      const minDim  = Math.min(W, H);
+      const dateNum = new Date().getDate();
       const dw = minDim * 0.13, dh = minDim * 0.09;
-      const dx = cx + minDim * 0.26,  dy = cy;
+      const dx = cx + minDim * 0.26, dy = cy;
       const bg = currentMode === 'light' ? '#fff' : '#000';
       ctx.save();
       ctx.fillStyle = bg;
@@ -652,6 +650,29 @@
       ctx.textBaseline = 'middle';
       ctx.fillText(String(dateNum), dx, dy + dh * 0.08);
       ctx.restore();
+
+      ctx = mainCtx;
+      staticLayerKey = currentMode + ':' + dateNum;
+    }
+
+    function drawAnalog() {
+      const now = new Date();
+      const s   = now.getSeconds();
+      const m   = now.getMinutes();
+      const h   = (now.getHours() % 12) + m / 60;
+
+      const W      = canvas.width, H = canvas.height;
+      const cx     = W / 2, cy = H / 2;
+      const minDim = Math.min(W, H);
+      const r      = minDim / 2;
+      const color  = currentMode === 'light' ? '#000' : '#fff';
+
+      // 테마·날짜 변경 시에만 정적 레이어 재생성
+      const key = currentMode + ':' + now.getDate();
+      if (staticLayerKey !== key) drawStaticLayer(W, H, cx, cy, r, color);
+
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(offscreenCanvas, 0, 0);
 
       // 바늘: rotate(angle), 기본 방향 = 12시 방향(위)
       function hand(angle, length, width) {
@@ -713,11 +734,12 @@
 
     function startAnalog() {
       setupCanvas();
-      if (analogRaf) cancelAnimationFrame(analogRaf);
-      function loop() {
-        if (clockMode === 'analog') { drawAnalog(); analogRaf = requestAnimationFrame(loop); }
-      }
-      loop();
+      if (analogInterval) clearInterval(analogInterval);
+      drawAnalog();
+      analogInterval = setInterval(() => {
+        if (clockMode === 'analog') drawAnalog();
+        else { clearInterval(analogInterval); analogInterval = null; }
+      }, 1000);
     }
 
     canvas.addEventListener('touchend', e => {
