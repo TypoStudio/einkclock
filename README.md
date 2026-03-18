@@ -18,7 +18,7 @@ Open `index.html` in any browser or e-reader's built-in browser. No server or bu
 ### Clock
 - Digital mode — large time display with date and day of week
 - Analog mode — 12 clock face styles (circle, rectangle, fullscreen)
-- Analog mode — tap the center to cycle hand configuration: hour+minute+second → hour+minute → hour only (extended to tick marks)
+- Analog mode — tap the center to cycle 6 hand configurations (see below)
 - Double-tap anywhere to toggle fullscreen
 
 ### Weather
@@ -63,7 +63,16 @@ Open `index.html` in any browser or e-reader's built-in browser. No server or bu
 
 ### Analog Mode
 
-Single-tap the clock face to cycle through 12 styles. Double-tap to toggle fullscreen. Tap the **center** to cycle hand configuration: hour+minute+second → hour+minute → hour only (extended to tick marks).
+Single-tap the clock face to cycle through 12 styles. Double-tap to toggle fullscreen. Tap the **center** to cycle hand configurations:
+
+| # | Hand Mode |
+|---|-----------|
+| 0 | Hour + Minute + Second hands |
+| 1 | Hour + Minute hands |
+| 2 | Hour hand only (extended to tick marks) |
+| 3 | Inverted sector between hour and minute hands |
+| 4 | Inverted semicircle (rotates with hour hand, ticks auto-invert) |
+| 5 | Conic gradient (elapsed time fades toward current hour) |
 
 | Style | Shape | Tick Type |
 |-------|-------|-----------|
@@ -106,7 +115,7 @@ E-Ink Clock is available under the [GNU General Public License v3.0](LICENSE).
 ### 주요 기능
 
 - **시계** — 디지털 모드(시각·날짜·요일 표시)와 아날로그 모드(12가지 페이스 스타일) 지원
-- **아날로그 바늘** — 중앙 터치로 시분초침 → 시분침 → 시침(눈금까지) 순환
+- **아날로그 바늘** — 중앙 터치로 6가지 바늘 구성 순환 (아래 표 참고)
 - **날씨** — 2개 지역의 현재 날씨 및 7일 예보, API 키 불필요, 주간 예보 터치로 즉시 갱신
 - **달력** — 날짜를 터치해 월간 달력 열기, ‹ / › 로 월 이동
 - **화면 모드** — 다크/라이트 모드 전환, 더블탭 전체화면
@@ -134,7 +143,16 @@ E-Ink Clock is available under the [GNU General Public License v3.0](LICENSE).
 
 #### 아날로그 모드
 
-시계를 한 번 터치할 때마다 스타일이 순서대로 바뀝니다. 두 번 연속 터치하면 전체화면으로 전환됩니다. 시계 **중앙**을 터치하면 바늘 구성이 바뀝니다 — 시분초침 → 시분침 → 시침(눈금까지).
+시계를 한 번 터치할 때마다 스타일이 순서대로 바뀝니다. 두 번 연속 터치하면 전체화면으로 전환됩니다. 시계 **중앙**을 터치하면 바늘 구성이 순환합니다:
+
+| # | 바늘 구성 |
+|---|-----------|
+| 0 | 시·분·초침 |
+| 1 | 시·분침 |
+| 2 | 시침만 (눈금까지 확장) |
+| 3 | 시·분침 사이 영역 반전 |
+| 4 | 반원 반전 (시침 방향 회전, 눈금·날짜 자동 반전) |
+| 5 | 코닉 그라데이션 (현재 시각까지 경과 시간 표시) |
 
 | 번호 | 형태 | 눈금 |
 |------|------|------|
