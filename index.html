@@ -122,7 +122,8 @@
     body.analog #lock-btn { top: auto; bottom: 4vw; left: calc(50% + 10vw); right: auto; }
     body.analog-fullscreen #lock-btn { bottom: 14vw; color: #fff; mix-blend-mode: difference; }
     body.locked #invert-btn, body.locked #mode-btn, body.locked #help-btn { display: none; }
-    body.analog.locked #lock-btn { left: 50%; transform: translate(-50%, 0); }
+    body.analog.locked #lock-btn { left: 50%; transform: translate(-50%, 0); pointer-events: none; }
+    body.analog.locked.lock-hidden #lock-btn { opacity: 0; }
 
     /* ── 달력 ── */
     #cal-overlay { display: none; flex-direction: column; align-items: center; width: 101%; height: 60vw }
@@ -226,7 +227,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.9</div>
+        <div>v1.1.10</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -336,6 +337,7 @@
       locked = state;
       localStorage.setItem('eink_locked', state ? '1' : '0');
       document.body.classList.toggle('locked', state);
+      document.body.classList.remove('lock-hidden');
       lockIcon.textContent = state ? 'lock' : 'lock_open';
     }
     applyLock(locked);
@@ -396,7 +398,8 @@
     let offscreenCanvas = null, offCtx = null, staticLayerKey = null;
     let handsOffscreen  = null, handsOffCtx = null, handsLayerKey = null;
     let analogState = parseInt(localStorage.getItem('eink_astate') || '0');
-    let handMode    = parseInt(localStorage.getItem('eink_hmode')  || '0'); // 0:시분초침 1:시분침 2:시침 3:시·분침사이반전 4:반원반전 5:코닉그라데이션
+    let handMode       = parseInt(localStorage.getItem('eink_hmode')  || '0'); // 0:시분초침 1:시분침 2:시침 3:시·분침사이반전 4:반원반전 5:코닉그라데이션
+    let longPressTimer = null, longPressFired = false;
 
     function getTickState()   { return analogState % 4; }
     function getClockShape()  { return analogState < 5 ? 'circle' : analogState < 8 ? 'rect' : 'fullscreen'; }
@@ -914,8 +917,26 @@
       }, 1000);
     }
 
+    canvas.addEventListener('touchstart', e => {
+      if (!locked) return;
+      longPressFired = false;
+      longPressTimer = setTimeout(() => {
+        longPressFired = true;
+        longPressTimer = null;
+        applyLock(false);
+      }, 600);
+    }, { passive: true });
+
+    canvas.addEventListener('touchcancel', () => {
+      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    });
+
     canvas.addEventListener('touchend', e => {
       e.stopPropagation();
+
+      // 길게 터치 타이머 정리
+      if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+      if (longPressFired) { longPressFired = false; return; }
 
       // 더블탭 전체화면: 잠금 상태에서도 허용
       const now = Date.now();
@@ -933,7 +954,11 @@
       }
       lastTap = now;
 
-      if (locked) return;
+      if (locked) {
+        // 짧게 터치: 잠금 아이콘 표시/숨김 토글
+        document.body.classList.toggle('lock-hidden');
+        return;
+      }
 
       // 중앙 탭 감지: 반경 12% 이내면 바늘 구성 순환
       const t    = e.changedTouches[0];
