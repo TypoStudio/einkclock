@@ -28,14 +28,16 @@
     body.light { background: #fff; color: #000; }
     body.light .divider, body.light .w-sep { background: #000; }
 
-    /* ── 가로 모드 ── */
-    body.landscape {
+    /* ── 화면 회전 ── */
+    body.orient-1, body.orient-3 {
       position: fixed;
-      transform: rotate(-90deg);
       width: 100vh; height: 100vw;
       top: calc((100vh - 100vw) / 2);
       left: calc((100vw - 100vh) / 2);
     }
+    body.orient-1 { transform: rotate(-90deg); }
+    body.orient-2 { transform: rotate(180deg); }
+    body.orient-3 { transform: rotate(90deg); }
 
     .material-symbols-outlined {
       font-family: 'Material Symbols Outlined';
@@ -85,7 +87,7 @@
     #orient-btn { position: fixed; top: 3vw; right: 12vw; font-size: 6vw; cursor: pointer;
       background: none; border: none; color: inherit; padding: 1vw; line-height: 1; z-index: 10;
       display: flex; align-items: center; }
-    body.analog #orient-btn { top: auto; bottom: 4vw; left: calc(50% + 20vw); right: auto; transform: translate(-50%, 0); }
+    body.analog #orient-btn { top: auto; bottom: 4vw; left: calc(50% + 15vw); right: auto; transform: translate(-50%, 0); }
     body.analog-fullscreen #orient-btn { bottom: 14vw; color: #fff; mix-blend-mode: difference; }
     body.locked #orient-btn { display: none; }
 
@@ -98,18 +100,21 @@
     #clock-panel { display: flex; flex-direction: column; align-items: center; }
     #weather-panel { display: flex; flex-direction: column; align-items: center; width: 90vw; }
 
-    /* 가로 모드 디지털 2열 레이아웃 */
-    body.landscape #digital-content { flex-direction: row; align-items: stretch; height: 100vw; width: 100vh; }
-    body.landscape #clock-panel { flex: 1; justify-content: center; border-right: 2px solid currentColor; padding: 0 2vh; }
-    body.landscape #weather-panel { flex: 1; justify-content: center; padding: 0 2vh; width: auto; }
-    body.landscape #clock { font-size: 20vw; margin-top: 0; margin-bottom: 1vw; }
-    body.landscape #date  { font-size: 5vw; }
-    body.landscape #day   { font-size: 3.5vw; margin-bottom: 0; }
-    body.landscape #weather-row  { width: 100%; }
-    body.landscape #weekly-section { width: 100%; }
-    body.landscape .divider { width: 100%; margin: 2vw auto; }
+    /* 가로 모드(orient-1/3) 디지털 2열 레이아웃 */
+    body.orient-1 #digital-content, body.orient-3 #digital-content { flex-direction: row; align-items: stretch; height: 100vw; width: 100vh; }
+    body.orient-1 #clock-panel, body.orient-3 #clock-panel { flex: 1; justify-content: center; padding: 0 2vh; }
+    body.orient-1 #weather-panel, body.orient-3 #weather-panel { flex: 1; justify-content: center; padding: 0 2vh; width: auto; }
+    body.orient-1 #clock, body.orient-3 #clock { flex-direction: column; align-items: center; font-size: 20vw; margin-top: 0; margin-bottom: 1vw; line-height: 1; }
+    body.orient-1 #clock-s, body.orient-3 #clock-s { flex-direction: row; padding: 0; align-self: center; }
+    body.orient-1 #date,  body.orient-3 #date  { font-size: 5vw; }
+    body.orient-1 #day,   body.orient-3 #day   { font-size: 3.5vw; margin-bottom: 0; }
+    body.orient-1 #weather-row,     body.orient-3 #weather-row     { width: 100%; }
+    body.orient-1 #weekly-section,  body.orient-3 #weekly-section  { width: 100%; }
+    body.orient-1 .divider,         body.orient-3 .divider         { width: 100%; margin: 2vw auto; }
+    body.orient-1 #weather-panel > .divider:first-child,
+    body.orient-3 #weather-panel > .divider:first-child { display: none; }
     /* 가로 모드 아날로그 fullscreen 캔버스 */
-    body.landscape.analog-fullscreen #analog-clock { width: 100vh !important; height: 100vw !important; }
+    body.orient-1.analog-fullscreen #analog-clock, body.orient-3.analog-fullscreen #analog-clock { width: 100vh !important; height: 100vw !important; }
 
     #clock  { font-size: 32vw; font-weight: 700; letter-spacing: -0.02em; line-height: 1; text-align: center; margin-top: 11vw; margin-bottom: 3vw; display: flex; align-items: baseline; justify-content: center; }
     #date   { font-size: 7vw; margin-top: 0vw; letter-spacing: 0.08em; text-align: center; }
@@ -146,12 +151,12 @@
     body.analog-fullscreen #analog-clock { position: fixed; top: 0; left: 0; z-index: 0; }
     body.analog #invert-btn, body.analog #mode-btn, body.analog #lock-btn { top: auto; bottom: 4vw; transform: translate(-50%, 0); }
     body.analog-fullscreen #invert-btn, body.analog-fullscreen #mode-btn { bottom: 14vw; color: #fff; mix-blend-mode: difference; }
-    body.analog #invert-btn { left: calc(50% - 10vw); }
-    body.analog #mode-btn   { left: calc(50%); }
+    body.analog #invert-btn { left: calc(50% - 15vw); }
+    body.analog #mode-btn   { left: calc(50% - 5vw); }
     #lock-btn { position: fixed; top: 3vw; right: 3vw; font-size: 6vw; cursor: pointer;
       background: none; border: none; color: inherit; padding: 1vw; line-height: 1; z-index: 10;
       display: flex; align-items: center; }
-    body.analog #lock-btn { top: auto; bottom: 4vw; left: calc(50% + 10vw); right: auto; }
+    body.analog #lock-btn { top: auto; bottom: 4vw; left: calc(50% + 5vw); right: auto; }
     body.analog-fullscreen #lock-btn { bottom: 14vw; color: #fff; mix-blend-mode: difference; }
     body.locked #invert-btn, body.locked #mode-btn, body.locked #help-btn { display: none; }
     body.analog.locked #lock-btn { left: 50%; transform: translate(-50%, 0); pointer-events: none; }
@@ -260,7 +265,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.11</div>
+        <div>v1.1.12</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -341,6 +346,8 @@
       { name: '구로3동', lat: 37.4954, lon: 126.8874 },
       { name: '신갈동',  lat: 37.2742, lon: 127.1166 },
     ];
+    
+    let clockMode = localStorage.getItem('eink_cmode') || 'digital';
 
     function loadLocs() {
       try { const s = localStorage.getItem('eink_locs'); if (s) return JSON.parse(s); } catch(e) {}
@@ -381,20 +388,25 @@
     lockBtn.addEventListener('click', () => applyLock(!locked));
     lockBtn.addEventListener('touchend', e => { e.stopPropagation(); e.preventDefault(); applyLock(!locked); });
 
-    /* ── 가로 모드 ── */
-    let landscape = parseInt(localStorage.getItem('eink_orient') || '0') === 1;
+    /* ── 화면 회전 ── */
+    let orient = parseInt(localStorage.getItem('eink_orient') || '0') % 4;
     const orientBtn = document.getElementById('orient-btn');
-    function applyLandscape(state) {
-      landscape = state;
-      localStorage.setItem('eink_orient', state ? '1' : '0');
-      document.body.classList.toggle('landscape', state);
-      orientBtn.querySelector('.material-symbols-outlined').textContent =
-        state ? 'screen_lock_rotation' : 'screen_rotation';
+
+    function applyOrient(n) {
+      orient = ((n % 4) + 4) % 4;
+      localStorage.setItem('eink_orient', orient);
+      document.body.classList.remove('orient-1', 'orient-2', 'orient-3');
+      if (orient > 0) document.body.classList.add('orient-' + orient);
+      orientBtn.querySelector('.material-symbols-outlined').textContent = 'screen_rotation';
+    }
+    // 초기화: CSS 클래스·아이콘만 적용 (캔버스 아직 미초기화)
+    applyOrient(orient);
+    function cycleOrient() {
+      applyOrient(orient + 1);
       if (clockMode === 'analog') { setupCanvas(); staticLayerKey = null; handsLayerKey = null; drawAnalog(); }
     }
-    applyLandscape(landscape);
-    orientBtn.addEventListener('click', () => applyLandscape(!landscape));
-    orientBtn.addEventListener('touchend', e => { e.stopPropagation(); e.preventDefault(); applyLandscape(!landscape); });
+    orientBtn.addEventListener('click', cycleOrient);
+    orientBtn.addEventListener('touchend', e => { e.stopPropagation(); e.preventDefault(); cycleOrient(); });
 
     invertBtn.addEventListener('click', e => {
       e.stopPropagation();
@@ -405,7 +417,6 @@
     invertBtn.addEventListener('touchend', e => e.stopPropagation());
 
     /* ── 디지털/아날로그 모드 ── */
-    let clockMode = localStorage.getItem('eink_cmode') || 'digital';
     const modeBtn  = document.getElementById('mode-btn');
     const modeIcon = modeBtn.querySelector('.material-symbols-outlined');
 
@@ -504,8 +515,9 @@
         document.body.classList.add('analog-rect');
         document.body.classList.remove('analog-fullscreen');
       } else {
-        const cw = landscape ? window.innerHeight : window.innerWidth;
-        const ch = landscape ? window.innerWidth  : window.innerHeight;
+        const swap = orient === 1 || orient === 3;
+        const cw = swap ? window.innerHeight : window.innerWidth;
+        const ch = swap ? window.innerWidth  : window.innerHeight;
         canvas.width  = cw; canvas.height = ch;
         canvas.style.width  = cw + 'px';
         canvas.style.height = ch + 'px';
