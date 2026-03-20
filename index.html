@@ -226,7 +226,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.7</div>
+        <div>v1.1.9</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -340,7 +340,7 @@
     }
     applyLock(locked);
     lockBtn.addEventListener('click', () => applyLock(!locked));
-    lockBtn.addEventListener('touchend', e => { e.stopPropagation(); applyLock(!locked); });
+    lockBtn.addEventListener('touchend', e => { e.stopPropagation(); e.preventDefault(); applyLock(!locked); });
 
     invertBtn.addEventListener('click', e => {
       e.stopPropagation();
@@ -916,6 +916,23 @@
 
     canvas.addEventListener('touchend', e => {
       e.stopPropagation();
+
+      // 더블탭 전체화면: 잠금 상태에서도 허용
+      const now = Date.now();
+      if (now - lastTap < 300) {
+        lastTap = 0;
+        if (!locked) {
+          // 첫 탭의 모드 변경 취소
+          analogState = (analogState - 1 + 12) % 12;
+          localStorage.setItem('eink_astate', analogState);
+          setupCanvas(); drawAnalog();
+        }
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+        else document.exitFullscreen().catch(()=>{});
+        return;
+      }
+      lastTap = now;
+
       if (locked) return;
 
       // 중앙 탭 감지: 반경 12% 이내면 바늘 구성 순환
@@ -933,18 +950,6 @@
         return;
       }
 
-      const now = Date.now();
-      if (now - lastTap < 300) {
-        // 첫 탭의 모드 변경 취소
-        analogState = (analogState - 1 + 12) % 12;
-        localStorage.setItem('eink_astate', analogState);
-        setupCanvas(); drawAnalog();
-        if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
-        else document.exitFullscreen().catch(()=>{});
-        lastTap = 0;
-        return;
-      }
-      lastTap = now;
       analogState = (analogState + 1) % 12;
       localStorage.setItem('eink_astate', analogState);
       setupCanvas(); drawAnalog();
