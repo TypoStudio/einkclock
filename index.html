@@ -112,10 +112,17 @@
     body.analog #analog-clock { display: block; }
     body.analog-rect #analog-clock { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0; }
     body.analog-fullscreen #analog-clock { position: fixed; top: 0; left: 0; z-index: 0; }
-    body.analog #invert-btn, body.analog #mode-btn { top: auto; bottom: 4vw; }
+    body.analog #invert-btn, body.analog #mode-btn, body.analog #lock-btn { top: auto; bottom: 4vw; transform: translate(-50%, 0); }
     body.analog-fullscreen #invert-btn, body.analog-fullscreen #mode-btn { bottom: 14vw; color: #fff; mix-blend-mode: difference; }
     body.analog #invert-btn { left: calc(50% - 10vw); }
     body.analog #mode-btn   { left: calc(50%); }
+    #lock-btn { position: fixed; top: 3vw; right: 3vw; font-size: 6vw; cursor: pointer;
+      background: none; border: none; color: inherit; padding: 1vw; line-height: 1; z-index: 10;
+      display: flex; align-items: center; }
+    body.analog #lock-btn { top: auto; bottom: 4vw; left: calc(50% + 10vw); right: auto; }
+    body.analog-fullscreen #lock-btn { bottom: 14vw; color: #fff; mix-blend-mode: difference; }
+    body.locked #invert-btn, body.locked #mode-btn, body.locked #help-btn { display: none; }
+    body.analog.locked #lock-btn { left: 50%; transform: translate(-50%, 0); }
 
     /* ── 달력 ── */
     #cal-overlay { display: none; flex-direction: column; align-items: center; width: 101%; height: 60vw }
@@ -175,6 +182,7 @@
   <button id="invert-btn"><span class="material-symbols-outlined">light_mode</span></button>
   <button id="mode-btn"><span class="material-symbols-outlined">schedule</span></button>
   <button id="help-btn"><span class="material-symbols-outlined">help_outline</span></button>
+  <button id="lock-btn"><span class="material-symbols-outlined" id="lock-icon">lock_open</span></button>
 
   <!-- 도움말 팝업 -->
   <div id="help-overlay">
@@ -218,7 +226,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.6</div>
+        <div>v1.1.7</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -320,8 +328,23 @@
     }
     applyMode(currentMode);
 
+    /* ── 잠금 ── */
+    let locked = parseInt(localStorage.getItem('eink_locked') || '0') === 1;
+    const lockBtn  = document.getElementById('lock-btn');
+    const lockIcon = document.getElementById('lock-icon');
+    function applyLock(state) {
+      locked = state;
+      localStorage.setItem('eink_locked', state ? '1' : '0');
+      document.body.classList.toggle('locked', state);
+      lockIcon.textContent = state ? 'lock' : 'lock_open';
+    }
+    applyLock(locked);
+    lockBtn.addEventListener('click', () => applyLock(!locked));
+    lockBtn.addEventListener('touchend', e => { e.stopPropagation(); applyLock(!locked); });
+
     invertBtn.addEventListener('click', e => {
       e.stopPropagation();
+      if (locked) return;
       applyMode(currentMode === 'light' ? 'dark' : 'light');
       if (clockMode === 'analog') { staticLayerKey = null; handsLayerKey = null; drawAnalog(); }
     });
@@ -341,7 +364,7 @@
       if (mode === 'analog') startAnalog();
     }
 
-    modeBtn.addEventListener('click', e => { e.stopPropagation(); applyClockMode(clockMode === 'digital' ? 'analog' : 'digital'); });
+    modeBtn.addEventListener('click', e => { e.stopPropagation(); if (locked) return; applyClockMode(clockMode === 'digital' ? 'analog' : 'digital'); });
     modeBtn.addEventListener('touchend', e => e.stopPropagation());
 
     /* ── 더블탭 전체화면 ── */
@@ -893,6 +916,7 @@
 
     canvas.addEventListener('touchend', e => {
       e.stopPropagation();
+      if (locked) return;
 
       // 중앙 탭 감지: 반경 12% 이내면 바늘 구성 순환
       const t    = e.changedTouches[0];
@@ -1124,6 +1148,7 @@
     }
     document.getElementById('date').addEventListener('touchend', e => {
       e.stopPropagation();
+      if (locked) return;
       calOverlay.classList.contains('open') ? closeCal() : openCal();
     });
     document.getElementById('cal-prev').addEventListener('click', e => {
@@ -1153,6 +1178,7 @@
 
     document.getElementById('weekly-section').addEventListener('touchend', e => {
       e.stopPropagation();
+      if (locked) return;
       fetchAllWeather();
       fetchWeekly(weeklyLocIdx);
     });
