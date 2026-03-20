@@ -28,6 +28,15 @@
     body.light { background: #fff; color: #000; }
     body.light .divider, body.light .w-sep { background: #000; }
 
+    /* ── 가로 모드 ── */
+    body.landscape {
+      position: fixed;
+      transform: rotate(-90deg);
+      width: 100vh; height: 100vw;
+      top: calc((100vh - 100vw) / 2);
+      left: calc((100vw - 100vh) / 2);
+    }
+
     .material-symbols-outlined {
       font-family: 'Material Symbols Outlined';
       font-weight: normal; font-style: normal;
@@ -72,12 +81,35 @@
 
     #clock-s { display: flex; flex-direction: column; align-items: center; font-size: 7vw; font-weight: 400; line-height: 1.1; align-self: center; padding: 0 2vw; }
 
+    /* ── 회전 버튼 ── */
+    #orient-btn { position: fixed; top: 3vw; right: 12vw; font-size: 6vw; cursor: pointer;
+      background: none; border: none; color: inherit; padding: 1vw; line-height: 1; z-index: 10;
+      display: flex; align-items: center; }
+    body.analog #orient-btn { top: auto; bottom: 4vw; left: calc(50% + 20vw); right: auto; transform: translate(-50%, 0); }
+    body.analog-fullscreen #orient-btn { bottom: 14vw; color: #fff; mix-blend-mode: difference; }
+    body.locked #orient-btn { display: none; }
+
     /* ── 디지털 컨텐츠 ── */
     #digital-content {
       display: flex; flex-direction: column;
       align-items: center; width: 100%;
     }
     body.analog #digital-content { display: none; }
+    #clock-panel { display: flex; flex-direction: column; align-items: center; }
+    #weather-panel { display: flex; flex-direction: column; align-items: center; width: 90vw; }
+
+    /* 가로 모드 디지털 2열 레이아웃 */
+    body.landscape #digital-content { flex-direction: row; align-items: stretch; height: 100vw; width: 100vh; }
+    body.landscape #clock-panel { flex: 1; justify-content: center; border-right: 2px solid currentColor; padding: 0 2vh; }
+    body.landscape #weather-panel { flex: 1; justify-content: center; padding: 0 2vh; width: auto; }
+    body.landscape #clock { font-size: 20vw; margin-top: 0; margin-bottom: 1vw; }
+    body.landscape #date  { font-size: 5vw; }
+    body.landscape #day   { font-size: 3.5vw; margin-bottom: 0; }
+    body.landscape #weather-row  { width: 100%; }
+    body.landscape #weekly-section { width: 100%; }
+    body.landscape .divider { width: 100%; margin: 2vw auto; }
+    /* 가로 모드 아날로그 fullscreen 캔버스 */
+    body.landscape.analog-fullscreen #analog-clock { width: 100vh !important; height: 100vw !important; }
 
     #clock  { font-size: 32vw; font-weight: 700; letter-spacing: -0.02em; line-height: 1; text-align: center; margin-top: 11vw; margin-bottom: 3vw; display: flex; align-items: baseline; justify-content: center; }
     #date   { font-size: 7vw; margin-top: 0vw; letter-spacing: 0.08em; text-align: center; }
@@ -184,6 +216,7 @@
   <button id="mode-btn"><span class="material-symbols-outlined">schedule</span></button>
   <button id="help-btn"><span class="material-symbols-outlined">help_outline</span></button>
   <button id="lock-btn"><span class="material-symbols-outlined" id="lock-icon">lock_open</span></button>
+  <button id="orient-btn"><span class="material-symbols-outlined">screen_rotation</span></button>
 
   <!-- 도움말 팝업 -->
   <div id="help-overlay">
@@ -227,7 +260,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.10</div>
+        <div>v1.1.11</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -235,9 +268,12 @@
   </div>
   <!-- 디지털 모드 -->
   <div id="digital-content">
-    <div id="clock"><span id="clock-h">--</span><span id="clock-s">--</span><span id="clock-m">--</span></div>
-    <div id="date">---- . -- . --</div>
-    <div id="day">-------</div>
+    <div id="clock-panel">
+      <div id="clock"><span id="clock-h">--</span><span id="clock-s">--</span><span id="clock-m">--</span></div>
+      <div id="date">---- . -- . --</div>
+      <div id="day">-------</div>
+    </div>
+    <div id="weather-panel">
     <div class="divider"></div>
     <div id="weather-row">
       <div class="weather-col" id="w0">
@@ -264,6 +300,7 @@
     <div id="weekly-section">
       <div id="weekly-row"><!-- JS로 채움 --></div>
     </div>
+    </div><!-- /#weather-panel -->
     <!-- 달력 (날씨 대체) -->
     <div id="cal-overlay">
       <div id="cal-header">
@@ -343,6 +380,21 @@
     applyLock(locked);
     lockBtn.addEventListener('click', () => applyLock(!locked));
     lockBtn.addEventListener('touchend', e => { e.stopPropagation(); e.preventDefault(); applyLock(!locked); });
+
+    /* ── 가로 모드 ── */
+    let landscape = parseInt(localStorage.getItem('eink_orient') || '0') === 1;
+    const orientBtn = document.getElementById('orient-btn');
+    function applyLandscape(state) {
+      landscape = state;
+      localStorage.setItem('eink_orient', state ? '1' : '0');
+      document.body.classList.toggle('landscape', state);
+      orientBtn.querySelector('.material-symbols-outlined').textContent =
+        state ? 'screen_lock_rotation' : 'screen_rotation';
+      if (clockMode === 'analog') { setupCanvas(); staticLayerKey = null; handsLayerKey = null; drawAnalog(); }
+    }
+    applyLandscape(landscape);
+    orientBtn.addEventListener('click', () => applyLandscape(!landscape));
+    orientBtn.addEventListener('touchend', e => { e.stopPropagation(); e.preventDefault(); applyLandscape(!landscape); });
 
     invertBtn.addEventListener('click', e => {
       e.stopPropagation();
@@ -452,10 +504,11 @@
         document.body.classList.add('analog-rect');
         document.body.classList.remove('analog-fullscreen');
       } else {
-        canvas.width  = window.innerWidth;
-        canvas.height = window.innerHeight;
-        canvas.style.width  = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
+        const cw = landscape ? window.innerHeight : window.innerWidth;
+        const ch = landscape ? window.innerWidth  : window.innerHeight;
+        canvas.width  = cw; canvas.height = ch;
+        canvas.style.width  = cw + 'px';
+        canvas.style.height = ch + 'px';
         document.body.classList.remove('analog-rect');
         document.body.classList.add('analog-fullscreen');
       }
