@@ -20,8 +20,6 @@
       background: #000; color: #fff;
       font-family: 'Courier New', Courier, monospace;
       width: 100vw; height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
       overflow: hidden; user-select: none;
       -webkit-tap-highlight-color: transparent;
     }
@@ -29,15 +27,21 @@
     body.light .divider, body.light .w-sep { background: #000; }
 
     /* ── 화면 회전 ── */
-    body.orient-1, body.orient-3 {
+    #screen {
+      width: 100vw; height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: inherit;
+    }
+    body.orient-1 #screen, body.orient-3 #screen {
       position: fixed;
       width: 100vh; height: 100vw;
       top: calc((100vh - 100vw) / 2);
       left: calc((100vw - 100vh) / 2);
     }
-    body.orient-1 { transform: rotate(-90deg); }
-    body.orient-2 { transform: rotate(180deg); }
-    body.orient-3 { transform: rotate(90deg); }
+    body.orient-1 #screen { transform: rotate(-90deg); }
+    body.orient-2 #screen { transform: rotate(180deg); }
+    body.orient-3 #screen { transform: rotate(90deg); }
 
     .material-symbols-outlined {
       font-family: 'Material Symbols Outlined';
@@ -49,19 +53,37 @@
     }
 
     /* ── 고정 버튼 ── */
-    #invert-btn, #mode-btn {
-      position: fixed; top: 3vw;
-      font-size: 6vw; cursor: pointer;
-      background: none; border: none; color: inherit;
+    .tool-btn {
+      position: fixed; font-size: 6vw; cursor: pointer;
+      background: none; border: none; color: #fff;
+      mix-blend-mode: difference;
       padding: 1vw; line-height: 1; z-index: 10;
       display: flex; align-items: center;
     }
-    #invert-btn { left: 3vw; }
-    #mode-btn   { left: 12vw; }
-    #help-btn   { position: fixed; top: 3vw; left: 21vw; font-size: 6vw; cursor: pointer;
-      background: none; border: none; color: inherit; padding: 1vw; line-height: 1; z-index: 10;
-      display: flex; align-items: center; }
+    
+    #invert-btn { top: 3vw; left: 3vw; }
+    #mode-btn   { top: 3vw; left: 12vw; }
+    #help-btn   { top: 3vw; left: 21vw; }
+    #lock-btn   { top: 3vw; right: 3vw; }
+    #orient-btn { top: 3vw; right: 12vw; }
     body.analog #help-btn { display: none; }
+    /* 아날로그: 하단 중앙 4버튼 */
+    body.analog #invert-btn, body.analog #mode-btn,
+    body.analog #lock-btn,   body.analog #orient-btn {
+      top: auto; bottom: 4vw; transform: translate(-50%, 0);
+    }
+    body.analog #invert-btn { left: calc(50% - 15vw); }
+    body.analog #mode-btn   { left: calc(50% -  5vw); }
+    body.analog #lock-btn   { left: calc(50% +  5vw); right: auto; }
+    body.analog #orient-btn { left: calc(50% + 15vw); right: auto; }
+    body.analog-fullscreen #invert-btn, body.analog-fullscreen #mode-btn,
+    body.analog-fullscreen #lock-btn,   body.analog-fullscreen #orient-btn {
+      bottom: 14vw; color: #fff; mix-blend-mode: difference;
+    }
+    body.locked #invert-btn, body.locked #mode-btn,
+    body.locked #help-btn,   body.locked #orient-btn { display: none; }
+    body.analog.locked #lock-btn { left: 50%; pointer-events: none; }
+    body.analog.locked.lock-hidden #lock-btn { opacity: 0; }
 
     /* ── 도움말 팝업 ── */
     #help-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -81,44 +103,93 @@
       padding: 1.5vw 8vw; cursor: pointer; letter-spacing: 0.1em; }
     body.light #help-close { border-color: #000; color: #000; }
 
-    #clock-s { display: flex; flex-direction: column; align-items: center; font-size: 7vw; font-weight: 400; line-height: 1.1; align-self: center; padding: 0 2vw; }
-
-    /* ── 회전 버튼 ── */
-    #orient-btn { position: fixed; top: 3vw; right: 12vw; font-size: 6vw; cursor: pointer;
-      background: none; border: none; color: inherit; padding: 1vw; line-height: 1; z-index: 10;
-      display: flex; align-items: center; }
-    body.analog #orient-btn { top: auto; bottom: 4vw; left: calc(50% + 15vw); right: auto; transform: translate(-50%, 0); }
-    body.analog-fullscreen #orient-btn { bottom: 14vw; color: #fff; mix-blend-mode: difference; }
-    body.locked #orient-btn { display: none; }
 
     /* ── 디지털 컨텐츠 ── */
     #digital-content {
       display: flex; flex-direction: column;
-      align-items: center; width: 100%;
+      align-items: center; justify-content: center;
+      width: 100%; height: 100%;
     }
     body.analog #digital-content { display: none; }
-    #clock-panel { display: flex; flex-direction: column; align-items: center; }
-    #weather-panel { display: flex; flex-direction: column; align-items: center; width: 90vw; }
+    #top-panel, #clock-panel, #date-panel, #weather-panel {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    #top-panel { width: 100%; }
+    #clock-panel, #date-panel { width: 100%; }
+    #weather-panel { width: 90vw; }
 
-    /* 가로 모드(orient-1/3) 디지털 2열 레이아웃 */
-    body.orient-1 #digital-content, body.orient-3 #digital-content { flex-direction: row; align-items: stretch; height: 100vw; width: 100vh; }
-    body.orient-1 #clock-panel, body.orient-3 #clock-panel { flex: 1; justify-content: center; padding: 0 2vh; }
-    body.orient-1 #weather-panel, body.orient-3 #weather-panel { flex: 1; justify-content: center; padding: 0 2vh; width: auto; }
-    body.orient-1 #clock, body.orient-3 #clock { flex-direction: column; align-items: center; font-size: 20vw; margin-top: 0; margin-bottom: 1vw; line-height: 1; }
-    body.orient-1 #clock-s, body.orient-3 #clock-s { flex-direction: row; padding: 0; align-self: center; }
-    body.orient-1 #date,  body.orient-3 #date  { font-size: 5vw; }
-    body.orient-1 #day,   body.orient-3 #day   { font-size: 3.5vw; margin-bottom: 0; }
-    body.orient-1 #weather-row,     body.orient-3 #weather-row     { width: 100%; }
-    body.orient-1 #weekly-section,  body.orient-3 #weekly-section  { width: 100%; }
-    body.orient-1 .divider,         body.orient-3 .divider         { width: 100%; margin: 2vw auto; }
-    body.orient-1 #weather-panel > .divider:first-child,
-    body.orient-3 #weather-panel > .divider:first-child { display: none; }
+    /* 가로 모드(orient-1/3) 디지털 상·하 2행 레이아웃 */
+    body.orient-1 #digital-content, body.orient-3 #digital-content {
+      align-items: stretch; justify-content: flex-start;
+      width: 100vh; height: 100vw; padding: 6vw 4vw 3.5vw;
+    }
+    body.orient-1 #top-panel, body.orient-3 #top-panel {
+      flex: 0 0 60%; flex-direction: row; align-items: center;
+      width: 100%; min-height: 0; padding-top: 4vw;
+    }
+    body.orient-1 #clock-panel, body.orient-3 #clock-panel {
+      flex: 0 0 65%; align-items: center; justify-content: center;
+      min-width: 0; padding-right: 3vw;
+    }
+    body.orient-1 #date-panel, body.orient-3 #date-panel {
+      align-items: center; justify-content: center;
+      min-width: 0; padding-left: 3vw;
+    }
+    body.orient-1 #weather-panel, body.orient-3 #weather-panel,
+    body.orient-1 #cal-overlay, body.orient-3 #cal-overlay {
+      flex: 1; width: 100%; min-height: 0;
+    }
+    body.orient-1 #weather-panel, body.orient-3 #weather-panel {
+      flex-direction: row; align-items: stretch;
+    }
+    body.orient-1 #clock, body.orient-3 #clock {
+      justify-content: flex-start; font-size: 28vw;
+      margin-top: 0; margin-bottom: 0; line-height: 1;
+    }
+    body.orient-1 #date,  body.orient-3 #date  { font-size: 4.6vw; text-align: left; }
+    body.orient-1 #day,   body.orient-3 #day   { font-size: 3.2vw; margin-bottom: 0; text-align: left; }
+    body.orient-1 .layout-divider, body.orient-3 .layout-divider {
+      width: 100%; margin: 1vw 0 1.8vw;
+    }
+    body.orient-1 #weather-row, body.orient-3 #weather-row {
+      flex: 0 0 52%; width: auto; min-width: 0; align-items: stretch;
+    }
+    body.orient-1 .weather-divider, body.orient-3 .weather-divider {
+      width: 2px; height: auto; margin: 0 2vw; align-self: stretch;
+    }
+    body.orient-1 #weekly-section, body.orient-3 #weekly-section {
+      flex: 1; width: auto; min-width: 0;
+      justify-content: center; align-items: center; gap: 0.8vw;
+    }
+    body.orient-1 .weather-col, body.orient-3 .weather-col {
+      gap: 0.55vw; justify-content: center; text-align: center;
+    }
+    body.orient-1 .w-sep, body.orient-3 .w-sep { margin: 0 2vw; }
+    body.orient-1 .w-name, body.orient-3 .w-name { font-size: 3.5vw; }
+    body.orient-1 .w-main, body.orient-3 .w-main { gap: 0.9vw; justify-content: center; }
+    body.orient-1 .w-icon, body.orient-3 .w-icon { font-size: 4vw }
+    body.orient-1 .w-temp, body.orient-3 .w-temp { font-size: 5.8vw; }
+    body.orient-1 .w-desc-row, body.orient-3 .w-desc-row { gap: 0.8vw; }
+    body.orient-1 .w-desc, body.orient-3 .w-desc { font-size: 3vw; }
+    body.orient-1 .w-detail, body.orient-3 .w-detail { font-size: 2.4vw; line-height: 1.35; }
+    body.orient-1 .w-weekly-sel, body.orient-3 .w-weekly-sel { font-size: 2vw; }
+    body.orient-1 #weekly-row, body.orient-3 #weekly-row {
+      min-width: 0; justify-content: center; align-items: center; gap: 0.2vw;
+    }
+    body.orient-1 .day-col, body.orient-3 .day-col {
+      gap: 0.5vw; justify-content: center; padding: 0.8vw 0.2vw; text-align: center;
+    }
+    body.orient-1 .day-name, body.orient-3 .day-name { font-size: 2vw; }
+    body.orient-1 .day-icon, body.orient-3 .day-icon { font-size: 3.3vw; }
+    body.orient-1 .day-max, body.orient-3 .day-max { font-size: 2.3vw; }
+    body.orient-1 .day-min, body.orient-3 .day-min { font-size: 2vw; }
     /* 가로 모드 아날로그 fullscreen 캔버스 */
     body.orient-1.analog-fullscreen #analog-clock, body.orient-3.analog-fullscreen #analog-clock { width: 100vh !important; height: 100vw !important; }
 
     #clock  { font-size: 32vw; font-weight: 700; letter-spacing: -0.02em; line-height: 1; text-align: center; margin-top: 11vw; margin-bottom: 3vw; display: flex; align-items: baseline; justify-content: center; }
     #date   { font-size: 7vw; margin-top: 0vw; letter-spacing: 0.08em; text-align: center; }
     #day    { font-size: 5vw; letter-spacing: 0.2em; margin-top: 1vw; margin-bottom: 5vw; text-align: center; }
+    #clock-s { display: flex; flex-direction: column; align-items: center; font-size: 7vw; font-weight: 400; line-height: 1.1; align-self: center; padding: 0 2vw; }
     .divider { width: 80vw; height: 2px; background: #fff; margin: 3vw auto; }
 
     /* ── 현재 날씨 ── */
@@ -126,10 +197,10 @@
     .weather-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1vw; cursor: pointer; }
     .w-sep  { width: 2px; align-self: stretch; background: #fff; margin: 0 3vw; }
     .w-name { font-size: 4vw; letter-spacing: 0.1em; text-align: center; cursor: pointer; border-bottom: 1px dashed currentColor; padding-bottom: 0.5vw; }
-    .w-main { display: flex; align-items: center; gap: 2vw; }
+    .w-main { display: flex; align-items: center; justify-content: center; gap: 2vw; }
     .w-icon { font-size: 8vw; line-height: 1; }
     .w-temp { font-size: 8vw; font-weight: 700; letter-spacing: -0.02em; }
-    .w-desc-row { display: flex; align-items: center; gap: 1.5vw; }
+    .w-desc-row { display: flex; align-items: center; justify-content: center; gap: 1.5vw; }
     .w-desc   { font-size: 3.5vw; letter-spacing: 0.1em; }
     .w-detail { font-size: 2.8vw; letter-spacing: 0.04em; text-align: center; }
     .w-weekly-sel { font-size: 3.5vw; line-height: 1; visibility: hidden; }
@@ -149,21 +220,10 @@
     body.analog #analog-clock { display: block; }
     body.analog-rect #analog-clock { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 0; }
     body.analog-fullscreen #analog-clock { position: fixed; top: 0; left: 0; z-index: 0; }
-    body.analog #invert-btn, body.analog #mode-btn, body.analog #lock-btn { top: auto; bottom: 4vw; transform: translate(-50%, 0); }
-    body.analog-fullscreen #invert-btn, body.analog-fullscreen #mode-btn { bottom: 14vw; color: #fff; mix-blend-mode: difference; }
-    body.analog #invert-btn { left: calc(50% - 15vw); }
-    body.analog #mode-btn   { left: calc(50% - 5vw); }
-    #lock-btn { position: fixed; top: 3vw; right: 3vw; font-size: 6vw; cursor: pointer;
-      background: none; border: none; color: inherit; padding: 1vw; line-height: 1; z-index: 10;
-      display: flex; align-items: center; }
-    body.analog #lock-btn { top: auto; bottom: 4vw; left: calc(50% + 5vw); right: auto; }
-    body.analog-fullscreen #lock-btn { bottom: 14vw; color: #fff; mix-blend-mode: difference; }
-    body.locked #invert-btn, body.locked #mode-btn, body.locked #help-btn { display: none; }
-    body.analog.locked #lock-btn { left: 50%; transform: translate(-50%, 0); pointer-events: none; }
-    body.analog.locked.lock-hidden #lock-btn { opacity: 0; }
+
 
     /* ── 달력 ── */
-    #cal-overlay { display: none; flex-direction: column; align-items: center; width: 101%; height: 60vw }
+    #cal-overlay { display: none; flex-direction: column; align-items: center; width: 90vw; height: 60vw; }
     #cal-overlay.open { display: flex; }
     #cal-header { display: flex; align-items: center; justify-content: space-between;
       width: 90vw; margin-bottom: 2vw; }
@@ -178,9 +238,19 @@
     .cal-cell { font-size: 4vw; text-align: center; padding: 1vw 0;
       border-radius: 1vw; }
     .cal-cell.today { border: 2px solid currentColor; font-weight: 700; }
-    .cal-cell.empty { }
     .cal-cell.sunday { opacity: 0.5; }
     .cal-cell.saturday { opacity: 0.5; }
+    body.orient-1 #cal-overlay, body.orient-3 #cal-overlay {
+      justify-content: flex-start; align-items: stretch;
+      height: auto; padding-top: 1vw;
+    }
+    body.orient-1 #cal-header, body.orient-3 #cal-header,
+    body.orient-1 #cal-days, body.orient-3 #cal-days,
+    body.orient-1 #cal-grid, body.orient-3 #cal-grid { width: 100%; }
+    body.orient-1 #cal-title, body.orient-3 #cal-title { font-size: 4.2vw; }
+    body.orient-1 .cal-nav, body.orient-3 .cal-nav { font-size: 6vw; }
+    body.orient-1 .cal-day-name, body.orient-3 .cal-day-name { font-size: 2.2vw; }
+    body.orient-1 .cal-cell, body.orient-3 .cal-cell { font-size: 2.8vw; padding: 0.7vw 0; }
 
     /* ── 모달 ── */
     #modal {
@@ -217,11 +287,12 @@
   </style>
 </head>
 <body>
-  <button id="invert-btn"><span class="material-symbols-outlined">light_mode</span></button>
-  <button id="mode-btn"><span class="material-symbols-outlined">schedule</span></button>
-  <button id="help-btn"><span class="material-symbols-outlined">help_outline</span></button>
-  <button id="lock-btn"><span class="material-symbols-outlined" id="lock-icon">lock_open</span></button>
-  <button id="orient-btn"><span class="material-symbols-outlined">screen_rotation</span></button>
+  <div id="screen">
+  <button id="invert-btn" class="tool-btn"><span class="material-symbols-outlined">light_mode</span></button>
+  <button id="mode-btn" class="tool-btn"><span class="material-symbols-outlined">schedule</span></button>
+  <button id="help-btn" class="tool-btn"><span class="material-symbols-outlined">help_outline</span></button>
+  <button id="lock-btn" class="tool-btn"><span class="material-symbols-outlined" id="lock-icon">lock_open</span></button>
+  <button id="orient-btn" class="tool-btn"><span class="material-symbols-outlined">screen_rotation</span></button>
 
   <!-- 도움말 팝업 -->
   <div id="help-overlay">
@@ -265,7 +336,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.12</div>
+        <div>v1.1.13</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -273,35 +344,45 @@
   </div>
   <!-- 디지털 모드 -->
   <div id="digital-content">
-    <div id="clock-panel">
-      <div id="clock"><span id="clock-h">--</span><span id="clock-s">--</span><span id="clock-m">--</span></div>
-      <div id="date">---- . -- . --</div>
-      <div id="day">-------</div>
+    <div id="top-panel">
+      <div id="clock-panel">
+        <div id="clock"><span id="clock-h">--</span><span id="clock-s">--</span><span id="clock-m">--</span></div>
+      </div>
+      <div id="date-panel">
+        <div id="date">---- . -- . --</div>
+        <div id="day">-------</div>
+      </div>
     </div>
+    <div class="divider layout-divider"></div>
     <div id="weather-panel">
-    <div class="divider"></div>
     <div id="weather-row">
       <div class="weather-col" id="w0">
         <div class="w-name" data-idx="0">구로3동</div>
         <div class="w-main">
-          <span class="w-icon material-symbols-outlined">wb_sunny</span>
           <span class="w-temp">--°</span>
+          <div class="w-desc-row">
+            <span class="w-icon material-symbols-outlined">wb_sunny</span>
+            <div class="w-desc">로딩중</div>
+            <span class="w-weekly-sel">▼</span>
+          </div>
         </div>
-        <div class="w-desc-row"><div class="w-desc">로딩중</div><span class="w-weekly-sel">▼</span></div>
         <div class="w-detail"></div>
       </div>
       <div class="w-sep"></div>
       <div class="weather-col" id="w1">
         <div class="w-name" data-idx="1">신갈동</div>
         <div class="w-main">
-          <span class="w-icon material-symbols-outlined">wb_sunny</span>
           <span class="w-temp">--°</span>
+          <div class="w-desc-row">
+            <span class="w-icon material-symbols-outlined">wb_sunny</span>
+            <div class="w-desc">로딩중</div>
+            <span class="w-weekly-sel">▼</span>
+          </div>
         </div>
-        <div class="w-desc-row"><div class="w-desc">로딩중</div><span class="w-weekly-sel">▼</span></div>
         <div class="w-detail"></div>
       </div>
     </div>
-    <div class="divider"></div>
+    <div class="divider weather-divider"></div>
     <div id="weekly-section">
       <div id="weekly-row"><!-- JS로 채움 --></div>
     </div>
@@ -337,6 +418,7 @@
     <div id="modal-results"></div>
     <button id="modal-close">닫기</button>
   </div>
+  </div><!-- /#screen -->
 
   <script>
     const DAYS_FULL  = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
@@ -448,9 +530,10 @@
       const now = new Date();
       document.getElementById('clock-h').textContent = pad(now.getHours());
       const ss = pad(now.getSeconds());
+      const sp = orient === 1 || orient === 3 ? '.' : ' . ';
       document.getElementById('clock-s').innerHTML = `<span>${ss[0]}</span><span>${ss[1]}</span>`;
       document.getElementById('clock-m').textContent = pad(now.getMinutes());
-      document.getElementById('date').textContent    = `${now.getFullYear()} . ${pad(now.getMonth()+1)} . ${pad(now.getDate())}`;
+      document.getElementById('date').textContent    = `${now.getFullYear()}${sp}${pad(now.getMonth()+1)}${sp}${pad(now.getDate())}`;
       document.getElementById('day').textContent     = DAYS_FULL[now.getDay()];
     }
 
@@ -507,8 +590,11 @@
         canvas.style.width = canvas.style.height = size + 'px';
         document.body.classList.remove('analog-rect', 'analog-fullscreen');
       } else if (getClockShape() === 'rect') {
-        const w = Math.round(window.innerWidth  * 0.86);
-        const h = Math.round(window.innerHeight * 0.78);
+        const swap = orient === 1 || orient === 3;
+        const baseW = swap ? window.innerHeight : window.innerWidth;
+        const baseH = swap ? window.innerWidth  : window.innerHeight;
+        const w = Math.round(baseW * 0.86);
+        const h = Math.round(baseH * 0.78);
         canvas.width  = w; canvas.height = h;
         canvas.style.width  = w + 'px';
         canvas.style.height = h + 'px';
@@ -1225,11 +1311,7 @@
       }
     }
 
-    const weatherEls = () => [
-      document.getElementById('weather-row'),
-      document.getElementById('weekly-section'),
-      ...document.querySelectorAll('.divider')
-    ];
+    const weatherEls = () => [document.getElementById('weather-panel')];
     function openCal() {
       const today = new Date();
       calYear = today.getFullYear(); calMonth = today.getMonth();
