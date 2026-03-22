@@ -167,7 +167,7 @@
     body.wide .w-sep { margin: 0 2vmin; }
     body.wide .w-name { font-size: 3.5vmin; }
     body.wide .w-main { gap: 0.9vmin; justify-content: center; }
-    body.wide .w-icon { font-size: 4vmin; }
+    body.wide .w-icon { font-size: 5vmin; }
     body.wide .w-temp { font-size: 5.8vmin; }
     body.wide .w-desc-row { gap: 0.8vmin; }
     body.wide .w-desc { font-size: 3vmin; min-width: 6vw; }
@@ -176,11 +176,11 @@
     body.wide #weekly-row {
       min-width: 0; justify-content: center; align-items: center; gap: 0.2vmin;
     }
-    body.wide .day-col { gap: 0.5vmin; justify-content: center; padding: 0.8vmin 0.2vmin; text-align: center; }
-    body.wide .day-name { font-size: 2vmin; }
-    body.wide .day-icon { font-size: 3.3vmin; }
-    body.wide .day-max { font-size: 2.3vmin; }
-    body.wide .day-min { font-size: 2vmin; }
+    body.wide .day-col { gap: 2vmin; justify-content: center; padding: 0.8vmin 0.2vmin; text-align: center; }
+    body.wide .day-name { font-size: 2.4vmin; }
+    body.wide .day-icon { font-size: 4vmin; }
+    body.wide .day-max { font-size: 2.5vmin; }
+    body.wide .day-min { font-size: 2.2vmin; }
     body.wide .tool-btn { font-size: 6vh; padding: 1vh; }
     body.wide #clock-s { font-size: 7vh; padding: 0 2vh; }
     /* 가로 모드 아날로그 fullscreen 캔버스 */
@@ -193,8 +193,8 @@
     .divider { width: 80vw; height: 2px; background: #fff; margin: 3vw auto; }
 
     /* ── 현재 날씨 ── */
-    #weather-row { display: flex; width: 90vw; align-items: flex-start; justify-content: center; }
-    .weather-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1vw; cursor: pointer; }
+    #weather-row { display: flex; width: 90vw; margin: 2vw 0; align-items: flex-start; justify-content: center; }
+    .weather-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2vw; cursor: pointer; }
     .w-sep  { width: 2px; align-self: stretch; background: #fff; margin: 0 1vw; }
     .w-name { font-size: 4vw; letter-spacing: 0.1em; text-align: center; cursor: pointer; border-bottom: 1px dashed currentColor; padding-bottom: 0.5vw; }
     .w-main { display: flex; align-items: center; justify-content: center; gap: 2vw; }
@@ -207,9 +207,9 @@
     .weather-col.weekly-active .w-weekly-sel { visibility: visible; }
 
     /* ── 주간 날씨 ── */
-    #weekly-section { width: 90vw; display: flex; flex-direction: column; align-items: center; gap: 2vw; }
+    #weekly-section { width: 90vw; display: flex; flex-direction: column; align-items: center; gap: 2vw; padding: 0 2vw; }
     #weekly-row { display: flex; width: 100%; justify-content: space-between; align-items: flex-start; }
-    .day-col  { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 0.8vw; padding: 1vw 0.5vw; }
+    .day-col  { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1.2vw; padding: 1vw 0.5vw; }
     .day-name { font-size: 3vw; letter-spacing: 0.05em; }
     .day-icon { font-size: 5vw; line-height: 1; }
     .day-max  { font-size: 3.5vw; font-weight: 700; }
