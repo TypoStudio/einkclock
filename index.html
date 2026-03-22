@@ -56,28 +56,28 @@
 
     /* ── 고정 버튼 ── */
     .tool-btn {
-      position: fixed; font-size: 6vw; cursor: pointer;
+      position: fixed; font-size: 6vmin; cursor: pointer;
       background: none; border: none; color: #fff;
       mix-blend-mode: difference;
-      padding: 1vw; line-height: 1; z-index: 10;
+      padding: 1vmin; line-height: 1; z-index: 10;
       display: flex; align-items: center;
     }
     
-    #invert-btn { top: 3vw; left: 3vw; }
-    #mode-btn   { top: 3vw; left: 12vw; }
-    #help-btn   { top: 3vw; left: 21vw; }
-    #lock-btn   { top: 3vw; right: 3vw; }
-    #orient-btn { top: 3vw; right: 12vw; }
+    #invert-btn { top: 3vmin; left: 3vmin; }
+    #mode-btn   { top: 3vmin; left: 12vmin; }
+    #help-btn   { top: 3vmin; left: 21vmin; }
+    #lock-btn   { top: 3vmin; right: 3vmin; }
+    #orient-btn { top: 3vmin; right: 12vmin; }
     body.analog #help-btn { display: none; }
     /* 아날로그: 하단 중앙 4버튼 */
     body.analog #invert-btn, body.analog #mode-btn,
     body.analog #lock-btn,   body.analog #orient-btn {
       top: auto; bottom: 3vh; transform: none;
     }
-    body.analog #invert-btn { left: 3vw; right: auto; }
-    body.analog #mode-btn   { left: 12vw; right: auto; }
-    body.analog #orient-btn { right: 12vw; left: auto; }
-    body.analog #lock-btn   { right: 3vw; left: auto; }
+    body.analog #invert-btn { left: 3vmin; right: auto; }
+    body.analog #mode-btn   { left: 12vmin; right: auto; }
+    body.analog #orient-btn { right: 12vmin; left: auto; }
+    body.analog #lock-btn   { right: 3vmin; left: auto; }
     /* 사각형·전체화면: 중앙 모음 */
     body.analog-rect #invert-btn, body.analog-rect #mode-btn,
     body.analog-rect #lock-btn,   body.analog-rect #orient-btn,
@@ -87,12 +87,12 @@
     }
     body.analog-fullscreen #invert-btn, body.analog-fullscreen #mode-btn,
     body.analog-fullscreen #lock-btn,   body.analog-fullscreen #orient-btn {
-      bottom: 10vw; color: #fff; mix-blend-mode: difference;
+      bottom: 10vmin; color: #fff; mix-blend-mode: difference;
     }
-    body.analog-rect #invert-btn, body.analog-fullscreen #invert-btn { left: calc(50% - 15vw); }
-    body.analog-rect #mode-btn,   body.analog-fullscreen #mode-btn   { left: calc(50% -  5vw); }
-    body.analog-rect #orient-btn, body.analog-fullscreen #orient-btn { left: calc(50% +  5vw); right: auto; }
-    body.analog-rect #lock-btn,   body.analog-fullscreen #lock-btn   { left: calc(50% + 15vw); right: auto; }
+    body.analog-rect #invert-btn, body.analog-fullscreen #invert-btn { left: calc(50% - 15vmin); }
+    body.analog-rect #mode-btn,   body.analog-fullscreen #mode-btn   { left: calc(50% -  5vmin); }
+    body.analog-rect #orient-btn, body.analog-fullscreen #orient-btn { left: calc(50% +  5vmin); right: auto; }
+    body.analog-rect #lock-btn,   body.analog-fullscreen #lock-btn   { left: calc(50% + 15vmin); right: auto; }
     body.analog-rect.locked #lock-btn, body.analog-fullscreen.locked #lock-btn { left: 50%; pointer-events: none; }
     body.locked #invert-btn, body.locked #mode-btn,
     body.locked #help-btn,   body.locked #orient-btn { display: none; }
@@ -101,19 +101,19 @@
     /* ── 도움말 팝업 ── */
     #help-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.92); z-index: 200; overflow-y: auto;
-      flex-direction: column; align-items: center; padding: 6vw 0 10vw; }
+      flex-direction: column; align-items: center; padding: 6vmin 0 10vmin; }
     #help-overlay.open { display: flex; }
     body.light #help-overlay { background: rgba(255,255,255,0.95); }
-    #help-content { width: 88vw; font-size: 3.8vw; line-height: 1.9; }
-    #help-content h2 { font-size: 6vw; font-weight: 700; margin-bottom: 5vw; text-align: center; letter-spacing: 0.05em; }
-    #help-content h3 { font-size: 4.5vw; font-weight: 700; margin: 4vw 0 1.5vw; border-bottom: 1px solid; padding-bottom: 1vw; }
-    #help-content p, #help-content li { font-size: 3.8vw; margin: 0.5vw 0; }
-    #help-content ul { padding-left: 4vw; }
-    #help-content .row { display: flex; gap: 2vw; align-items: baseline; margin: 0.8vw 0; }
-    #help-content .label { min-width: 22vw; font-weight: 700; }
-    #help-close { display: block; margin: 7vw auto 0; font-size: 4vw; background: none;
+    #help-content { width: 88vmin; font-size: 3.8vmin; line-height: 1.9; }
+    #help-content h2 { font-size: 6vmin; font-weight: 700; margin-bottom: 5vmin; text-align: center; letter-spacing: 0.05em; }
+    #help-content h3 { font-size: 4.5vmin; font-weight: 700; margin: 4vmin 0 1.5vmin; border-bottom: 1px solid; padding-bottom: 1vmin; }
+    #help-content p, #help-content li { font-size: 3.8vmin; margin: 0.5vmin 0; }
+    #help-content ul { padding-left: 4vmin; }
+    #help-content .row { display: flex; gap: 2vmin; align-items: baseline; margin: 0.8vmin 0; }
+    #help-content .label { min-width: 22vmin; font-weight: 700; }
+    #help-close { display: block; margin: 7vmin auto 0; font-size: 4vmin; background: none;
       border: 1px solid; color: inherit; font-family: 'Courier New', Courier, monospace;
-      padding: 1.5vw 8vw; cursor: pointer; letter-spacing: 0.1em; }
+      padding: 1.5vmin 8vmin; cursor: pointer; letter-spacing: 0.1em; }
     body.light #help-close { border-color: #000; color: #000; }
 
 
@@ -129,21 +129,23 @@
     }
     #top-panel { width: 100%; }
     #clock-panel, #date-panel { width: 100%; }
-    #weather-panel { width: 90vw; }
+    #weather-panel { width: 90vmin; }
 
     /* 정사각형에 가까운 세로 화면: 간격 축소 */
     @media (min-aspect-ratio: 3/4) {
       body:not(.wide) #clock { margin-top: 5vh; margin-bottom: -4vh; }
       body:not(.wide) #day { margin-bottom: 2vh; }
-      body:not(.wide) .divider { margin: 1.5vw auto; }
-      body:not(.wide) #weather-row { margin: 1vw 0; }
-      body:not(.wide) .weather-col { gap: 1vw; }
-      body:not(.wide) .day-col { gap: 0.5vw; padding: 0.5vw; }
-      body:not(.wide) #weekly-section { gap: 1vw; }
+      body:not(.wide) .divider { margin: 1.5vmin auto; }
+      body:not(.wide) #weather-row { margin: 1vmin 0; }
+      body:not(.wide) .weather-col { gap: 1vmin; }
+      body:not(.wide) .day-col { gap: 0.5vmin; padding: 0.5vmin; }
+      body:not(.wide) #weekly-section { gap: 1vmin; }
     }
 
     @media (min-aspect-ratio: 1) {
-      body:not(.wide) #weekly-section, body:not(.wide) .weather-divider, body:not(.wide) .w-weekly-sel
+      body:not(.wide):not(.orient-1):not(.orient-3) #weekly-section,
+      body:not(.wide):not(.orient-1):not(.orient-3) .weather-divider,
+      body:not(.wide):not(.orient-1):not(.orient-3) .w-weekly-sel
       { display: none; }
     }
 
@@ -159,6 +161,12 @@
       flex: 0 0 60%; flex-direction: row; align-items: center;
       width: 100%; min-height: 0; padding-top: 4vmin;
     }
+    body.wide.cal-open #top-panel {
+      flex: 0 0 40vmin; padding-top: 1vmin;
+    }
+    body.wide.cal-open #clock {
+      font-size: 22vmin; margin: 0;
+    }
     body.wide #clock-panel {
       flex: 0 0 65%; width: auto; align-items: center; justify-content: center;
       min-width: 0; padding-right: 3vmin;
@@ -168,7 +176,7 @@
       min-width: 0; padding-left: 3vmin;
     }
     body.wide #weather-panel, body.wide #cal-overlay {
-      flex: 1; width: 100%; min-height: 0;
+      flex: 1; width: 100%; min-height: 0; height: auto;
     }
     body.wide #weather-panel {
       flex-direction: row; align-items: stretch;
@@ -187,7 +195,7 @@
       width: 2px; height: auto; margin: 0 2vmin; align-self: stretch;
     }
     body.wide #weekly-section {
-      flex: 1; width: auto; min-width: 0; margin-right: 3vw;
+      flex: 1; width: auto; min-width: 0; margin-right: 3vmin;
       justify-content: center; align-items: center; gap: 0.8vmin;
     }
     body.wide .weather-col { gap: 2vmin; justify-content: center; text-align: center; }
@@ -197,7 +205,7 @@
     body.wide .w-icon { font-size: 5vmin; }
     body.wide .w-temp { font-size: 5.8vmin; }
     body.wide .w-desc-row { gap: 0.8vmin; }
-    body.wide .w-desc { font-size: 3vmin; min-width: 6vw; }
+    body.wide .w-desc { font-size: 3vmin; min-width: 6vmin; }
     body.wide .w-detail { font-size: 2.4vmin; line-height: 1.35; }
     body.wide .w-weekly-sel { font-size: 2vmin; }
     body.wide #weekly-row {
@@ -208,39 +216,38 @@
     body.wide .day-icon { font-size: 4vmin; }
     body.wide .day-max { font-size: 2.5vmin; }
     body.wide .day-min { font-size: 2.2vmin; }
-    body.wide .tool-btn { font-size: 6vh; padding: 1vh; }
-    body.wide #clock-s { font-size: 7vh; padding: 0 2vh; }
+    body.wide #clock-s { font-size: 7vmin; padding: 0 2vmin; }
     /* 가로 모드 아날로그 fullscreen 캔버스 */
     body.orient-1.analog-fullscreen #analog-clock, body.orient-3.analog-fullscreen #analog-clock { width: 100vh !important; height: 100vw !important; }
 
-    #clock  { font-size: 32vw; font-weight: 700; letter-spacing: -0.02em; line-height: 1; text-align: center; margin-top: 11vw; margin-bottom: 3vw; display: flex; align-items: baseline; justify-content: center; }
-    #date   { font-size: 7vw; margin-top: 0vw; letter-spacing: 0.08em; text-align: center; word-spacing: -20px; }
-    #day    { font-size: 5vw; letter-spacing: 0.2em; margin-top: 1vw; margin-bottom: 5vw; text-align: center; }
-    #clock-s { display: flex; flex-direction: column; align-items: center; font-size: 7vw; font-weight: 400; line-height: 1.1; align-self: center; padding: 0 2vw; }
-    .divider { width: 80vw; height: 2px; background: #fff; margin: 3vw auto; }
+    #clock  { font-size: 32vmin; font-weight: 700; letter-spacing: -0.02em; line-height: 1; text-align: center; margin-top: 11vmin; margin-bottom: 3vmin; display: flex; align-items: baseline; justify-content: center; }
+    #date   { font-size: 7vmin; margin-top: 0vmin; letter-spacing: 0.08em; text-align: center; word-spacing: -20px; }
+    #day    { font-size: 5vmin; letter-spacing: 0.2em; margin-top: 1vmin; margin-bottom: 5vmin; text-align: center; }
+    #clock-s { display: flex; flex-direction: column; align-items: center; font-size: 7vmin; font-weight: 400; line-height: 1.1; align-self: center; padding: 0 2vmin; }
+    .divider { width: 80vmin; height: 2px; background: #fff; margin: 3vmin auto; }
 
     /* ── 현재 날씨 ── */
-    #weather-row { display: flex; width: 90vw; margin: 2vw 0; align-items: flex-start; justify-content: center; }
-    .weather-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2vw; cursor: pointer; }
-    .w-sep  { width: 2px; align-self: stretch; background: #fff; margin: 0 1vw; }
-    .w-name { font-size: 4vw; letter-spacing: 0.1em; text-align: center; cursor: pointer; border-bottom: 1px dashed currentColor; padding-bottom: 0.5vw; }
-    .w-main { display: flex; align-items: center; justify-content: center; gap: 2vw; }
-    .w-icon { font-size: 8vw; line-height: 1; }
-    .w-temp { font-size: 8vw; font-weight: 700; letter-spacing: -0.02em; }
-    .w-desc-row { display: flex; align-items: center; justify-content: center; gap: 1.5vw; }
-    .w-desc   { font-size: 3.5vw; letter-spacing: 0.1em; width: min-content; text-align: center; word-break: keep-all; }
-    .w-detail { font-size: 2.8vw; letter-spacing: 0.04em; text-align: center; }
-    .w-weekly-sel { font-size: 3.5vw; line-height: 1; visibility: hidden; }
+    #weather-row { display: flex; width: 90vmin; margin: 2vmin 0; align-items: flex-start; justify-content: center; }
+    .weather-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2vmin; cursor: pointer; }
+    .w-sep  { width: 2px; align-self: stretch; background: #fff; margin: 0 1vmin; }
+    .w-name { font-size: 4vmin; letter-spacing: 0.1em; text-align: center; cursor: pointer; border-bottom: 1px dashed currentColor; padding-bottom: 0.5vmin; }
+    .w-main { display: flex; align-items: center; justify-content: center; gap: 2vmin; }
+    .w-icon { font-size: 8vmin; line-height: 1; }
+    .w-temp { font-size: 8vmin; font-weight: 700; letter-spacing: -0.02em; }
+    .w-desc-row { display: flex; align-items: center; justify-content: center; gap: 1.5vmin; }
+    .w-desc   { font-size: 3.5vmin; letter-spacing: 0.1em; width: min-content; text-align: center; word-break: keep-all; }
+    .w-detail { font-size: 2.8vmin; letter-spacing: 0.04em; text-align: center; }
+    .w-weekly-sel { font-size: 3.5vmin; line-height: 1; visibility: hidden; }
     .weather-col.weekly-active .w-weekly-sel { visibility: visible; }
 
     /* ── 주간 날씨 ── */
-    #weekly-section { width: 90vw; display: flex; flex-direction: column; align-items: center; gap: 2vw; padding: 0 2vw; }
+    #weekly-section { width: 90vmin; display: flex; flex-direction: column; align-items: center; gap: 2vmin; padding: 0 2vmin; }
     #weekly-row { display: flex; width: 100%; justify-content: space-between; align-items: flex-start; }
-    .day-col  { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1.2vw; padding: 1vw 0.5vw; }
-    .day-name { font-size: 3vw; letter-spacing: 0.05em; }
-    .day-icon { font-size: 5vw; line-height: 1; }
-    .day-max  { font-size: 3.5vw; font-weight: 700; }
-    .day-min  { font-size: 3vw; }
+    .day-col  { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1.2vmin; padding: 1vmin 0.5vmin; }
+    .day-name { font-size: 3vmin; letter-spacing: 0.05em; }
+    .day-icon { font-size: 5vmin; line-height: 1; }
+    .day-max  { font-size: 3.5vmin; font-weight: 700; }
+    .day-min  { font-size: 3vmin; }
 
     /* ── 아날로그 시계 ── */
     #analog-clock { display: none; }
@@ -250,67 +257,65 @@
 
 
     /* ── 달력 ── */
-    #cal-overlay { display: none; flex-direction: column; align-items: center; width: 90vw; height: 60vw; }
+    #cal-overlay { display: none; flex-direction: column; align-items: center; width: 90vmin; height: 60vmin; }
     #cal-overlay.open { display: flex; }
     #cal-header { display: flex; align-items: center; justify-content: space-between;
-      width: 90vw; margin-bottom: 2vw; }
-    #cal-title { font-size: 5.5vw; font-weight: 700; letter-spacing: 0.05em; }
-    .cal-nav { background: none; border: none; color: inherit; font-size: 8vw;
-      cursor: pointer; padding: 0.5vw 2vw; line-height: 1; }
+      width: 90vmin; margin-bottom: 2vmin; }
+    #cal-title { font-size: 5.5vmin; font-weight: 700; letter-spacing: 0.05em; }
+    .cal-nav { background: none; border: none; color: inherit; font-size: 8vmin;
+      cursor: pointer; padding: 0.5vmin 2vmin; line-height: 1; }
     #cal-days { display: grid; grid-template-columns: repeat(7, 1fr);
-      width: 90vw; margin-bottom: 0.5vw; }
-    .cal-day-name { font-size: 3vw; text-align: center; padding: 0.5vw 0;
+      width: 90vmin; margin-bottom: 0.5vmin; }
+    .cal-day-name { font-size: 3vmin; text-align: center; padding: 0.5vmin 0;
       letter-spacing: 0.05em; opacity: 0.6; }
-    #cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); width: 90vw; gap: 0.5vw; }
-    .cal-cell { font-size: 4vw; text-align: center; padding: 1vw 0;
-      border-radius: 1vw; }
+    #cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); width: 90vmin; gap: 0.5vmin; }
+    .cal-cell { font-size: 4vmin; text-align: center; padding: 1vmin 0;
+      border-radius: 1vmin; }
     .cal-cell.today { border: 2px solid currentColor; font-weight: 700; }
     .cal-cell.sunday { opacity: 0.5; }
     .cal-cell.saturday { opacity: 0.5; }
-    body.orient-1 #cal-overlay, body.orient-3 #cal-overlay {
+    body.wide #cal-overlay {
       justify-content: flex-start; align-items: stretch;
-      height: auto; padding-top: 1vw;
+      padding-top: 1vmin;
     }
-    body.orient-1 #cal-header, body.orient-3 #cal-header,
-    body.orient-1 #cal-days, body.orient-3 #cal-days,
-    body.orient-1 #cal-grid, body.orient-3 #cal-grid { width: 100%; }
-    body.orient-1 #cal-title, body.orient-3 #cal-title { font-size: 4.2vw; }
-    body.orient-1 .cal-nav, body.orient-3 .cal-nav { font-size: 6vw; }
-    body.orient-1 .cal-day-name, body.orient-3 .cal-day-name { font-size: 2.2vw; }
-    body.orient-1 .cal-cell, body.orient-3 .cal-cell { font-size: 2.8vw; padding: 0.7vw 0; }
+    body.wide #cal-header, body.wide #cal-days, body.wide #cal-grid { width: 100%; }
+    body.wide #cal-title { font-size: 4.2vmin; }
+    body.wide .cal-nav { font-size: 6vmin; }
+    body.wide .cal-day-name { font-size: 2.2vmin; }
+    body.wide .cal-cell { font-size: 2.8vmin; padding: 0.7vmin 0; }
 
     /* ── 모달 ── */
     #modal {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.88); z-index: 100;
-      flex-direction: column; align-items: center; justify-content: flex-start; padding: 5vw; padding-top: 8vh;
+      flex-direction: column; align-items: center; justify-content: flex-start; padding: 5vmin; padding-top: 8vh;
     }
     body.light #modal { background: rgba(255,255,255,0.93); }
     #modal.open { display: flex; }
-    #modal-title { font-size: 5vw; margin-bottom: 3vw; letter-spacing: 0.1em; }
+    #modal-title { font-size: 5vmin; margin-bottom: 3vmin; letter-spacing: 0.1em; }
     #modal-input {
-      width: 80vw; font-size: 5vw; font-family: 'Courier New', Courier, monospace;
-      padding: 2vw 3vw; background: #000; color: #fff; border: 2px solid #fff; outline: none; letter-spacing: 0.05em;
+      width: 80vmin; font-size: 5vmin; font-family: 'Courier New', Courier, monospace;
+      padding: 2vmin 3vmin; background: #000; color: #fff; border: 2px solid #fff; outline: none; letter-spacing: 0.05em;
     }
     body.light #modal-input { background: #fff; color: #000; border-color: #000; }
     #modal-btn {
-      margin-top: 2vw; width: 80vw; font-size: 5vw;
+      margin-top: 2vmin; width: 80vmin; font-size: 5vmin;
       font-family: 'Courier New', Courier, monospace;
-      padding: 2vw; background: #fff; color: #000; border: none; cursor: pointer; letter-spacing: 0.1em;
+      padding: 2vmin; background: #fff; color: #000; border: none; cursor: pointer; letter-spacing: 0.1em;
     }
     body.light #modal-btn { background: #000; color: #fff; }
-    #modal-results { width: 80vw; margin-top: 2vw; max-height: 40vh; overflow-y: auto; }
-    .result-item { padding: 2.5vw 3vw; border-bottom: 1px solid #555; font-size: 3.5vw; cursor: pointer; letter-spacing: 0.03em; line-height: 1.4; }
+    #modal-results { width: 80vmin; margin-top: 2vmin; max-height: 40vh; overflow-y: auto; }
+    .result-item { padding: 2.5vmin 3vmin; border-bottom: 1px solid #555; font-size: 3.5vmin; cursor: pointer; letter-spacing: 0.03em; line-height: 1.4; }
     .result-item:active { background: #333; }
     body.light .result-item:active { background: #ddd; }
     #modal-close {
-      margin-top: 3vw; font-size: 4vw; background: none;
+      margin-top: 3vmin; font-size: 4vmin; background: none;
       border: 1px solid #fff; color: #fff;
       font-family: 'Courier New', Courier, monospace;
-      padding: 1.5vw 5vw; cursor: pointer; letter-spacing: 0.1em;
+      padding: 1.5vmin 5vmin; cursor: pointer; letter-spacing: 0.1em;
     }
     body.light #modal-close { border-color: #000; color: #000; }
-    #modal-status { font-size: 3.5vw; margin-top: 2vw; letter-spacing: 0.05em; min-height: 5vw; }
+    #modal-status { font-size: 3.5vmin; margin-top: 2vmin; letter-spacing: 0.05em; min-height: 5vmin; }
   </style>
 </head>
 <body>
@@ -327,9 +332,9 @@
       <h2>사용법</h2>
 
       <h3>공통 버튼</h3>
-      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vw;vertical-align:middle">light_mode</span> 버튼</span><span>화면 밝기 반전 (흑·백 전환)</span></div>
-      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vw;vertical-align:middle">schedule</span> 버튼</span><span>디지털 ↔ 아날로그 모드 전환</span></div>
-      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vw;vertical-align:middle">help_outline</span> 버튼</span><span>이 도움말 표시 (디지털 모드에서만)</span></div>
+      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vmin;vertical-align:middle">light_mode</span> 버튼</span><span>화면 밝기 반전 (흑·백 전환)</span></div>
+      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vmin;vertical-align:middle">schedule</span> 버튼</span><span>디지털 ↔ 아날로그 모드 전환</span></div>
+      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vmin;vertical-align:middle">help_outline</span> 버튼</span><span>이 도움말 표시 (디지털 모드에서만)</span></div>
 
       <h3>디지털 모드</h3>
       <ul>
@@ -362,8 +367,8 @@
 
       <button id="help-close">닫기</button>
 
-      <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.18</div>
+      <div style="margin-top:8vmin; text-align:center; font-size:3vmin; opacity:0.5; line-height:2;">
+        <div>v1.1.19</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -1357,12 +1362,19 @@
       renderCalendar();
       weatherEls().forEach(el => el.style.display = 'none');
       calOverlay.classList.add('open');
+      document.body.classList.add('cal-open');
     }
     function closeCal() {
       weatherEls().forEach(el => el.style.display = '');
       calOverlay.classList.remove('open');
+      document.body.classList.remove('cal-open');
     }
     document.getElementById('date').addEventListener('touchend', e => {
+      e.stopPropagation();
+      if (locked) return;
+      calOverlay.classList.contains('open') ? closeCal() : openCal();
+    });
+    document.getElementById('day').addEventListener('touchend', e => {
       e.stopPropagation();
       if (locked) return;
       calOverlay.classList.contains('open') ? closeCal() : openCal();
