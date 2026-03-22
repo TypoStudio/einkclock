@@ -131,6 +131,22 @@
     #clock-panel, #date-panel { width: 100%; }
     #weather-panel { width: 90vw; }
 
+    /* 정사각형에 가까운 세로 화면: 간격 축소 */
+    @media (min-aspect-ratio: 3/4) {
+      body:not(.wide) #clock { margin-top: 5vh; margin-bottom: -4vh; }
+      body:not(.wide) #day { margin-bottom: 2vh; }
+      body:not(.wide) .divider { margin: 1.5vw auto; }
+      body:not(.wide) #weather-row { margin: 1vw 0; }
+      body:not(.wide) .weather-col { gap: 1vw; }
+      body:not(.wide) .day-col { gap: 0.5vw; padding: 0.5vw; }
+      body:not(.wide) #weekly-section { gap: 1vw; }
+    }
+
+    @media (min-aspect-ratio: 1) {
+      body:not(.wide) #weekly-section, body:not(.wide) .weather-divider, body:not(.wide) .w-weekly-sel
+      { display: none; }
+    }
+
     /* 가로 모드 디지털 상·하 2행 레이아웃 (wide = 실효 가로 화면) */
     body.wide #digital-content {
       align-items: stretch; justify-content: flex-start;
@@ -347,7 +363,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.17</div>
+        <div>v1.1.18</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -488,9 +504,10 @@
     const orientBtn = document.getElementById('orient-btn');
 
     function updateWideClass() {
-      const natural = window.innerWidth > window.innerHeight;
+      const w = window.innerWidth, h = window.innerHeight;
       const rotated = orient === 1 || orient === 3;
-      document.body.classList.toggle('wide', natural !== rotated);
+      const ew = rotated ? h : w, eh = rotated ? w : h;
+      document.body.classList.toggle('wide', ew / eh >= 1000 / 850);
     }
     function applyOrient(n) {
       orient = ((n % 4) + 4) % 4;
