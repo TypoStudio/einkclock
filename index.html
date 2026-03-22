@@ -72,20 +72,31 @@
     /* 아날로그: 하단 중앙 4버튼 */
     body.analog #invert-btn, body.analog #mode-btn,
     body.analog #lock-btn,   body.analog #orient-btn {
-      top: auto; bottom: 4vw; transform: translate(-50%, 0);
+      top: auto; bottom: 3vh; transform: none;
     }
-    body.analog #invert-btn { left: calc(50% - 15vw); }
-    body.analog #mode-btn   { left: calc(50% -  5vw); }
-    body.analog #lock-btn   { left: calc(50% +  5vw); right: auto; }
-    body.analog #orient-btn { left: calc(50% + 15vw); right: auto; }
+    body.analog #invert-btn { left: 3vw; right: auto; }
+    body.analog #mode-btn   { left: 12vw; right: auto; }
+    body.analog #orient-btn { right: 12vw; left: auto; }
+    body.analog #lock-btn   { right: 3vw; left: auto; }
+    /* 사각형·전체화면: 중앙 모음 */
+    body.analog-rect #invert-btn, body.analog-rect #mode-btn,
+    body.analog-rect #lock-btn,   body.analog-rect #orient-btn,
     body.analog-fullscreen #invert-btn, body.analog-fullscreen #mode-btn,
     body.analog-fullscreen #lock-btn,   body.analog-fullscreen #orient-btn {
-      bottom: 14vw; color: #fff; mix-blend-mode: difference;
+      left: auto; right: auto; transform: translate(-50%, 0);
     }
+    body.analog-fullscreen #invert-btn, body.analog-fullscreen #mode-btn,
+    body.analog-fullscreen #lock-btn,   body.analog-fullscreen #orient-btn {
+      bottom: 10vw; color: #fff; mix-blend-mode: difference;
+    }
+    body.analog-rect #invert-btn, body.analog-fullscreen #invert-btn { left: calc(50% - 15vw); }
+    body.analog-rect #mode-btn,   body.analog-fullscreen #mode-btn   { left: calc(50% -  5vw); }
+    body.analog-rect #orient-btn, body.analog-fullscreen #orient-btn { left: calc(50% +  5vw); right: auto; }
+    body.analog-rect #lock-btn,   body.analog-fullscreen #lock-btn   { left: calc(50% + 15vw); right: auto; }
+    body.analog-rect.locked #lock-btn, body.analog-fullscreen.locked #lock-btn { left: 50%; pointer-events: none; }
     body.locked #invert-btn, body.locked #mode-btn,
     body.locked #help-btn,   body.locked #orient-btn { display: none; }
-    body.analog.locked #lock-btn { left: 50%; pointer-events: none; }
-    body.analog.locked.lock-hidden #lock-btn { opacity: 0; }
+    body.locked.lock-hidden #lock-btn { opacity: 0; }
 
     /* ── 도움말 팝업 ── */
     #help-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -336,7 +347,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vw; text-align:center; font-size:3vw; opacity:0.5; line-height:2;">
-        <div>v1.1.14</div>
+        <div>v1.1.17</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -405,10 +416,12 @@
       </div>
       <div id="cal-grid"></div>
     </div>
-  </div>
+  </div><!-- /#digital-content -->
 
   <!-- 아날로그 모드 -->
   <canvas id="analog-clock"></canvas>
+
+  </div><!-- /#screen -->
 
   <div id="modal">
     <div id="modal-title">위치 검색</div>
@@ -845,8 +858,10 @@
       ctx.fillStyle = color;
       ctx.font = `bold ${minDim * 0.065}px sans-serif`;
       ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(String(dateNum), dx, dy + dh * 0.08);
+      ctx.textBaseline = 'alphabetic';
+      const _dt = String(dateNum);
+      const _dm = ctx.measureText(_dt);
+      ctx.fillText(_dt, dx, dy + (_dm.actualBoundingBoxAscent - _dm.actualBoundingBoxDescent) / 2);
       ctx.restore();
 
       ctx = mainCtx;
