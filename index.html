@@ -1347,26 +1347,10 @@
           );
           const data = await res.json();
           const a = data.address || {};
-          const levels = [
-            { name: a.neighbourhood || a.suburb, label: a.neighbourhood || a.suburb },
-            { name: a.city_district || a.borough, label: a.city_district || a.borough },
-            { name: a.town || a.village, label: a.town || a.village },
-            { name: a.city, label: a.city },
-            { name: a.county, label: a.county },
-          ].filter(l => l.name);
-          if (!levels.length) { modalStatus.textContent = '결과 없음'; return; }
-          modalStatus.textContent = `${levels.length}개 결과`;
-          levels.forEach(l => {
-            const div = document.createElement('div');
-            div.className = 'result-item';
-            div.textContent = l.label;
-            div.addEventListener('click', () => {
-              locs[editingIdx] = { name: l.name, lat, lon };
-              saveLocs(); modal.classList.remove('open');
-              fetchWeatherFor(editingIdx); fetchWeekly(weeklyLocIdx);
-            });
-            modalResults.appendChild(div);
-          });
+          const q = a.city_district || a.borough || a.town || a.village || a.city || a.county || '';
+          if (!q) { modalStatus.textContent = '결과 없음'; return; }
+          modalInput.value = q;
+          doSearch();
         } catch(e) { modalStatus.textContent = '위치 변환 오류'; }
       }, err => {
         const msgs = { 1: '위치 권한이 거부됨', 2: '위치를 확인할 수 없음', 3: '시간 초과' };
