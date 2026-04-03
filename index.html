@@ -304,6 +304,12 @@
       padding: 2vmin; background: #fff; color: #000; border: none; cursor: pointer; letter-spacing: 0.1em;
     }
     body.light #modal-btn { background: #000; color: #fff; }
+    #modal-gps {
+      margin-top: 1.5vmin; width: 80vmin; font-size: 4vmin;
+      font-family: 'Courier New', Courier, monospace;
+      padding: 1.5vmin; background: none; color: #fff; border: 1px solid #888; cursor: pointer; letter-spacing: 0.1em;
+    }
+    body.light #modal-gps { color: #000; border-color: #888; }
     #modal-results { width: 80vmin; margin-top: 2vmin; max-height: 40vh; overflow-y: auto; }
     .result-item { padding: 2.5vmin 3vmin; border-bottom: 1px solid #555; font-size: 3.5vmin; cursor: pointer; letter-spacing: 0.03em; line-height: 1.4; }
     .result-item:active { background: #333; }
@@ -368,7 +374,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vmin; text-align:center; font-size:3vmin; opacity:0.5; line-height:2;">
-        <div>v1.1.19</div>
+        <div>v1.1.20</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;" target="_blank">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -448,6 +454,7 @@
     <div id="modal-title">위치 검색</div>
     <input id="modal-input" type="text" placeholder="동/읍/면 이름 입력" autocomplete="off">
     <button id="modal-btn">검색</button>
+    <button id="modal-gps">현재위치</button>
     <div id="modal-status"></div>
     <div id="modal-results"></div>
     <button id="modal-close">닫기</button>
@@ -1326,6 +1333,29 @@
 
     modalBtn.addEventListener('click', doSearch);
     modalInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+    /* ── 현재위치 GPS ── */
+    const modalGps = document.getElementById('modal-gps');
+    if (!('geolocation' in navigator)) modalGps.style.display = 'none';
+    modalGps.addEventListener('click', () => {
+      modalStatus.textContent = '위치 확인중...'; modalResults.innerHTML = '';
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ko`
+          );
+          const data = await res.json();
+          const name = data.address.city || data.address.town || data.address.village || data.address.county || data.display_name.split(',')[0];
+          locs[editingIdx] = { name, lat, lon };
+          saveLocs(); modal.classList.remove('open');
+          fetchWeatherFor(editingIdx); fetchWeekly(weeklyLocIdx);
+        } catch(e) { modalStatus.textContent = '위치 변환 오류'; }
+      }, err => {
+        const msgs = { 1: '위치 권한이 거부됨', 2: '위치를 확인할 수 없음', 3: '시간 초과' };
+        modalStatus.textContent = msgs[err.code] || '위치 오류';
+      }, { timeout: 10000 });
+    });
 
     /* ── 달력 ── */
     const calOverlay = document.getElementById('cal-overlay');
