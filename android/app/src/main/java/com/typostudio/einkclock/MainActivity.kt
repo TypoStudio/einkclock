@@ -2,7 +2,6 @@ package com.typostudio.einkclock
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -11,10 +10,14 @@ import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
+import java.io.File
+import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    private val htmlFile get() = File(filesDir, "index.html")
+    private val updateUrl = "https://raw.githubusercontent.com/TypoStudio/einkclock/main/index.html"
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +65,15 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        webView.loadUrl("file:///android_asset/index.html")
+        // 최초 실행 시 assets → 내부 저장소로 복사
+        if (!htmlFile.exists()) {
+            assets.open("index.html").use { it.copyTo(htmlFile.outputStream()) }
+        }
+
+        webView.loadUrl("file://${htmlFile.absolutePath}")
+
+        // 백그라운드에서 최신 index.html 다운로드 (다음 실행부터 적용)
+        fetchLatestHtml()
 
         onBackPressedDispatcher.addCallback(this,
             object : androidx.activity.OnBackPressedCallback(true) {
@@ -74,6 +85,15 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             })
+    }
+
+    private fun fetchLatestHtml() {
+        Thread {
+            try {
+                val content = URL(updateUrl).readText(Charsets.UTF_8)
+                htmlFile.writeText(content)
+            } catch (_: Exception) { }
+        }.start()
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {

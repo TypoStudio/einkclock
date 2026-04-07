@@ -110,7 +110,14 @@ Single-tap the clock face to cycle through 12 styles. Double-tap to toggle fulls
 ## Requirements
 
 - Any modern browser with JavaScript enabled
-- Internet connection for weather data (Open-Meteo API) and location search (Nominatim)
+- Internet connection for weather data and location search
+
+## Data Sources
+
+| Service | Provider | License |
+|---------|----------|---------|
+| Weather data | [MET Norway (api.met.no)](https://api.met.no/) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| Location search | [Nominatim / OpenStreetMap](https://nominatim.openstreetmap.org/) | [ODbL](https://opendatacommons.org/licenses/odbl/) |
 
 ## License
 
@@ -208,4 +215,11 @@ Gradle 또는 Android Studio가 필요합니다. 스크립트가 `index.html`을
 ### 요구 사항
 
 - JavaScript가 활성화된 브라우저
-- 날씨 데이터(Open-Meteo) 및 위치 검색(Nominatim) 사용 시 인터넷 연결 필요
+- 날씨 데이터 및 위치 검색 사용 시 인터넷 연결 필요
+
+### 데이터 출처
+
+| 서비스 | 제공처 | 라이선스 |
+|--------|--------|----------|
+| 날씨 데이터 | [MET Norway (api.met.no)](https://api.met.no/) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) |
+| 위치 검색 | [Nominatim / OpenStreetMap](https://nominatim.openstreetmap.org/) | [ODbL](https://opendatacommons.org/licenses/odbl/) |
