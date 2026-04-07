@@ -21,6 +21,9 @@ jobs:
       - name: Copy index.html to Android assets
         run: cp index.html android/app/src/main/assets/index.html
 
+      - name: Copy locales to Android assets
+        run: cp -r locales android/app/src/main/assets/
+
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
