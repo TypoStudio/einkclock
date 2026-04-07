@@ -57,6 +57,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         webView.webViewClient = object : WebViewClient() {
+            override fun shouldInterceptRequest(
+                view: WebView, request: WebResourceRequest
+            ): WebResourceResponse? {
+                val path = request.url.path ?: return null
+                if (request.url.scheme == "file" && path.endsWith(".json")) {
+                    val file = File(path)
+                    if (file.exists()) {
+                        return WebResourceResponse("application/json", "UTF-8", file.inputStream())
+                    }
+                }
+                return null
+            }
+
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val scheme = request.url.scheme ?: return false
                 if (scheme == "http" || scheme == "https") {
