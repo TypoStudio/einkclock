@@ -20,6 +20,14 @@ class MainActivity : AppCompatActivity() {
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
+        // 잠금화면 위에 앱 표시 (시계는 잠금 없이 보임, 다른 앱 전환 시 잠금 해제 요청)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+        } else {
+            @Suppress("DEPRECATION")
+            window.addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)
+        }
+
         webView = WebView(this)
         setContentView(webView)
 
