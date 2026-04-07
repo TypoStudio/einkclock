@@ -4,18 +4,21 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.webkit.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.webkit.WebViewAssetLoader
 import java.io.File
 import java.net.URL
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    private lateinit var assetLoader: WebViewAssetLoader
     private val htmlFile get() = File(filesDir, "index.html")
     private val localesDir get() = File(filesDir, "locales")
     private val updateUrl = "https://raw.githubusercontent.com/TypoStudio/einkclock/main/index.html"
@@ -38,6 +41,10 @@ class MainActivity : AppCompatActivity() {
         webView = WebView(this)
         setContentView(webView)
 
+        assetLoader = WebViewAssetLoader.Builder()
+            .addPathHandler("/files/", WebViewAssetLoader.InternalStoragePathHandler(this, filesDir))
+            .build()
+
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
@@ -54,23 +61,20 @@ class MainActivity : AppCompatActivity() {
             ) {
                 callback.invoke(origin, true, false)
             }
+            override fun onConsoleMessage(msg: ConsoleMessage): Boolean {
+                Log.d("EinkJS", "[${msg.messageLevel()}] ${msg.message()} (${msg.sourceId()}:${msg.lineNumber()})")
+                return true
+            }
         }
 
         webView.webViewClient = object : WebViewClient() {
             override fun shouldInterceptRequest(
                 view: WebView, request: WebResourceRequest
-            ): WebResourceResponse? {
-                val path = request.url.path ?: return null
-                if (request.url.scheme == "file" && path.endsWith(".json")) {
-                    val file = File(path)
-                    if (file.exists()) {
-                        return WebResourceResponse("application/json", "UTF-8", file.inputStream())
-                    }
-                }
-                return null
-            }
+            ): WebResourceResponse? = assetLoader.shouldInterceptRequest(request.url)
 
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                val host = request.url.host ?: return false
+                if (host == "appassets.androidplatform.net") return false
                 val scheme = request.url.scheme ?: return false
                 if (scheme == "http" || scheme == "https") {
                     startActivity(Intent(Intent.ACTION_VIEW, request.url))
@@ -91,7 +95,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        webView.loadUrl("file://${htmlFile.absolutePath}")
+        webView.loadUrl("https://appassets.androidplatform.net/files/index.html")
 
         // 백그라운드에서 최신 파일 다운로드 (다음 실행부터 적용)
         fetchLatestHtml()

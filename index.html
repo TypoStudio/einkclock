@@ -225,7 +225,7 @@
     body.orient-1.analog-fullscreen #analog-clock, body.orient-3.analog-fullscreen #analog-clock { width: 100vh !important; height: 100vw !important; }
 
     #clock  { font-size: 32vmin; font-weight: 700; letter-spacing: -0.02em; line-height: 1; text-align: center; margin-top: 11vmin; margin-bottom: 3vmin; display: flex; align-items: baseline; justify-content: center; }
-    #date   { font-size: 7vmin; margin-top: 0vmin; letter-spacing: 0.08em; text-align: center; word-spacing: -20px; }
+    #date   { font-size: 7vmin; margin-top: 0vmin; letter-spacing: 0.08em; text-align: center; word-spacing: -20px; direction: ltr; unicode-bidi: embed; }
     #day    { font-size: 5vmin; letter-spacing: 0.2em; margin-top: 1vmin; margin-bottom: 5vmin; text-align: center; }
     #clock-s { display: flex; flex-direction: column; align-items: center; font-size: 7vmin; font-weight: 400; line-height: 1.1; align-self: center; padding: 0 2vmin; }
     .divider { width: 80vmin; height: 2px; background: #fff; margin: 3vmin auto; }
@@ -475,7 +475,7 @@
     }
 
     function buildHelpHtml(d) {
-      const v = 'v1.1.29';
+      const v = 'v1.1.30';
       const styles = [
         [`0 — ${d.help_style_circle}`, d.help_tick_none],
         [`1 — ${d.help_style_circle}`, d.help_tick_4],
@@ -654,8 +654,8 @@
       const ss = pad(now.getSeconds());
       document.getElementById('clock-s').innerHTML = `<span>${ss[0]}</span><span>${ss[1]}</span>`;
       document.getElementById('clock-m').textContent = pad(now.getMinutes());
-      document.getElementById('date').textContent    = new Intl.DateTimeFormat(lang, { year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
-        .replace(/-/g, '.').replace(/\.\s*$/, '').replace(/\s*\.\s*/g, ' . ').trim();
+      document.getElementById('date').textContent    = new Intl.DateTimeFormat(lang, { year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now)
+        .filter(p => ['year','month','day'].includes(p.type)).map(p => p.value).join(' . ');
       document.getElementById('day').textContent     = new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(now);
     }
 
@@ -1540,6 +1540,7 @@
       lang = l;
       localStorage.setItem('eink_lang', l);
       document.documentElement.lang = l;
+      document.documentElement.dir = /^(ar|ur|he|fa|yi)/.test(l) ? 'rtl' : 'ltr';
       document.getElementById('help-content').innerHTML = L.help_html;
       document.getElementById('modal-title').textContent = L.modal_title;
       document.getElementById('modal-input').placeholder  = L.modal_placeholder;
