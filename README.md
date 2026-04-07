@@ -13,6 +13,24 @@ A web-based clock optimized for e-ink displays and e-readers. Supports digital a
 
 Open `index.html` in any browser or e-reader's built-in browser. No server or build step needed.
 
+## Android App
+
+An Android APK is available for e-ink devices such as the **Hisense Luna X** and other e-readers running Android 8+.
+
+**Install:**
+1. Download the latest `einkclock-vX.X.X.apk` from [GitHub Releases](https://github.com/TypoStudio/einkclock/releases/latest)
+2. Enable **Settings → Security → Install unknown apps** on your device
+3. Tap the downloaded APK to install
+
+The app loads the clock locally (no network required for the clock itself) and requests location permission for weather.
+
+**Build from source:**
+```bash
+bash scripts/build-android-local.sh         # debug APK
+bash scripts/build-android-local.sh release # release APK
+```
+Requires Gradle or Android Studio. The script copies `index.html` into assets automatically.
+
 ## Features
 
 ### Clock
@@ -111,6 +129,24 @@ E-Ink Clock is available under the [GNU General Public License v3.0](LICENSE).
 ### 사용법
 
 `index.html`을 브라우저나 전자책 리더의 내장 브라우저로 열면 됩니다. 서버나 빌드 과정이 필요 없습니다.
+
+### Android 앱 설치
+
+**Hisense Luna X** 등 Android 8+ e-ink 단말기용 APK를 제공합니다.
+
+**설치 방법:**
+1. [GitHub Releases](https://github.com/TypoStudio/einkclock/releases/latest)에서 최신 `einkclock-vX.X.X.apk` 다운로드
+2. **설정 → 보안 → 알 수 없는 앱 설치** 허용
+3. 다운로드한 APK 파일을 터치하여 설치
+
+앱은 `index.html`을 로컬에서 로드하므로 시계 표시에 네트워크가 필요 없으며, 날씨 기능 사용 시 위치 권한을 요청합니다.
+
+**소스에서 직접 빌드:**
+```bash
+bash scripts/build-android-local.sh         # 디버그 APK
+bash scripts/build-android-local.sh release # 릴리즈 APK
+```
+Gradle 또는 Android Studio가 필요합니다. 스크립트가 `index.html`을 assets에 자동으로 복사합니다.
 
 ### 주요 기능
 
