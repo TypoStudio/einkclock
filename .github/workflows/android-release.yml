@@ -29,8 +29,7 @@ jobs:
           gradle-version: '8.7'
 
       - name: Decode keystore
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ${{ runner.temp }}/release.jks
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > $RUNNER_TEMP/release.jks
 
       - name: Build release APK
         working-directory: android
@@ -43,8 +42,9 @@ jobs:
 
       - name: Rename APK
         run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
           find android/app/build/outputs/apk/release/ -name "*.apk" \
-            -exec mv {} android/app/build/outputs/apk/release/einkclock-${{ steps.version.outputs.VERSION }}.apk \;
+            -exec mv {} android/app/build/outputs/apk/release/einkclock-${VERSION}.apk \;
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
