@@ -11,8 +11,8 @@ android {
         applicationId = "com.typostudio.einkclock"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.1.23"
+        versionCode = 4
+        versionName = "1.1.24"
     }
 
     signingConfigs {

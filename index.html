@@ -382,7 +382,7 @@
       <button id="help-close">닫기</button>
 
       <div style="margin-top:8vmin; text-align:center; font-size:3vmin; opacity:0.5; line-height:2;">
-        <div>v1.1.23</div>
+        <div>v1.1.24</div>
         <div>Copyright &copy; 2026 TypoStudio</div>
         <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;" target="_blank">github.com/TypoStudio/einkclock</a></div>
       </div>
@@ -1192,19 +1192,26 @@
 
     window.addEventListener('resize', () => { if (clockMode === 'analog') setupCanvas(); });
 
-    /* ── 날씨 코드 ── */
-    function weatherCodeToInfo(code) {
-      if (code === 0) return { icon: 'wb_sunny',           desc: '맑음' };
-      if (code <= 2)  return { icon: 'partly_cloudy_day',  desc: '구름 조금' };
-      if (code === 3) return { icon: 'cloud',               desc: '흐림' };
-      if (code <= 49) return { icon: 'foggy',               desc: '안개' };
-      if (code <= 59) return { icon: 'rainy',               desc: '이슬비' };
-      if (code <= 69) return { icon: 'rainy',               desc: '비' };
-      if (code <= 79) return { icon: 'weather_snowy',       desc: '눈' };
-      if (code <= 82) return { icon: 'grain',               desc: '소나기' };
-      if (code <= 86) return { icon: 'ac_unit',             desc: '눈보라' };
-      if (code <= 99) return { icon: 'thunderstorm',        desc: '뇌우' };
-      return { icon: 'question_mark', desc: '알 수 없음' };
+    /* ── 날씨 심볼 (api.met.no) ── */
+    function symbolToInfo(code) {
+      const s = code.replace(/_(day|night|polartwilight)$/, '');
+      if (s === 'clearsky')                          return { icon: 'wb_sunny',          desc: '맑음' };
+      if (s === 'fair' || s === 'partlycloudy')      return { icon: 'partly_cloudy_day', desc: '구름 조금' };
+      if (s === 'cloudy')                            return { icon: 'cloud',             desc: '흐림' };
+      if (s === 'fog')                               return { icon: 'foggy',             desc: '안개' };
+      if (s.includes('thunder'))                    return { icon: 'thunderstorm',      desc: '뇌우' };
+      if (s.includes('snow') && s.includes('shower')) return { icon: 'ac_unit',         desc: '눈 소나기' };
+      if (s.includes('sleet'))                      return { icon: 'grain',             desc: '진눈깨비' };
+      if (s.includes('snow'))                       return { icon: 'weather_snowy',     desc: '눈' };
+      if (s.includes('shower'))                     return { icon: 'grain',             desc: '소나기' };
+      if (s.includes('rain'))                       return { icon: 'rainy',             desc: '비' };
+      return { icon: 'question_mark',               desc: '알 수 없음' };
+    }
+
+    function calcFeelsLike(tempC, windKmh) {
+      if (tempC <= 10 && windKmh >= 4.8)
+        return 13.12 + 0.6215*tempC - 11.37*Math.pow(windKmh,0.16) + 0.3965*tempC*Math.pow(windKmh,0.16);
+      return tempC;
     }
 
     /* ── 현재 날씨 ── */
@@ -1215,18 +1222,24 @@
       col.querySelector('.w-desc').textContent = '로딩중';
       try {
         const res  = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-          `&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m` +
-          `&wind_speed_unit=kmh&timezone=Asia%2FSeoul`
+          `https://api.met.no/weatherapi/locationforecast/2.0/compact` +
+          `?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}`
         );
         const data = await res.json();
-        const cur  = data.current;
-        const { icon, desc } = weatherCodeToInfo(cur.weather_code);
+        const ts   = data.properties.timeseries;
+        const now  = Date.now();
+        const entry = ts.reduce((a, b) =>
+          Math.abs(new Date(a.time) - now) <= Math.abs(new Date(b.time) - now) ? a : b
+        );
+        const d       = entry.data.instant.details;
+        const symbol  = (entry.data.next_1_hours || entry.data.next_6_hours)?.summary.symbol_code || 'clearsky_day';
+        const { icon, desc } = symbolToInfo(symbol);
+        const windKmh = d.wind_speed * 3.6;
         col.querySelector('.w-icon').textContent   = icon;
-        col.querySelector('.w-temp').textContent   = `${Math.round(cur.temperature_2m)}°`;
+        col.querySelector('.w-temp').textContent   = `${Math.round(d.air_temperature)}°`;
         col.querySelector('.w-desc').textContent   = desc;
         col.querySelector('.w-detail').textContent =
-          `체감${Math.round(cur.apparent_temperature)}° 습도${cur.relative_humidity_2m}% 풍량${Math.round(cur.wind_speed_10m)}`;
+          `체감${Math.round(calcFeelsLike(d.air_temperature, windKmh))}° 습도${Math.round(d.relative_humidity)}% 풍량${Math.round(windKmh)}`;
       } catch(e) { col.querySelector('.w-desc').textContent = '오류'; }
     }
 
@@ -1254,24 +1267,31 @@
       const { lat, lon } = locs[idx];
       try {
         const res  = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
-          `&daily=weather_code,temperature_2m_max,temperature_2m_min` +
-          `&forecast_days=7&timezone=Asia%2FSeoul`
+          `https://api.met.no/weatherapi/locationforecast/2.0/compact` +
+          `?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}`
         );
         const data = await res.json();
-        const { time, weather_code, temperature_2m_max, temperature_2m_min } = data.daily;
-        const todayStr = new Date().toISOString().slice(0, 10);
-        time.forEach((dateStr, i) => {
+        const ts   = data.properties.timeseries;
+        const toLocalDate = t => new Date(t).toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+        const byDate = {};
+        ts.forEach(e => { const d = toLocalDate(e.time); (byDate[d] = byDate[d] || []).push(e); });
+        const todayStr = toLocalDate(new Date());
+        Object.keys(byDate).sort().slice(0, 7).forEach((dateStr, i) => {
           const col = document.getElementById(`wd${i}`);
           if (!col) return;
-          const dow = new Date(dateStr + 'T12:00:00').getDay();
-          const { icon } = weatherCodeToInfo(weather_code[i]);
+          const entries = byDate[dateStr];
+          const temps   = entries.map(e => e.data.instant.details.air_temperature);
+          const maxTemp = Math.max(...temps), minTemp = Math.min(...temps);
+          const mid     = entries[Math.floor(entries.length / 2)];
+          const symbol  = (mid.data.next_1_hours || mid.data.next_6_hours || mid.data.next_12_hours)?.summary.symbol_code || 'clearsky_day';
+          const { icon } = symbolToInfo(symbol);
           const isToday  = dateStr === todayStr;
+          const dow      = new Date(dateStr + 'T12:00:00').getDay();
           col.className  = 'day-col';
           col.querySelector('.day-name').textContent = isToday ? '오늘' : DAYS_SHORT[dow];
           col.querySelector('.day-icon').textContent = icon;
-          col.querySelector('.day-max').textContent  = `${Math.round(temperature_2m_max[i])}°`;
-          col.querySelector('.day-min').textContent  = `${Math.round(temperature_2m_min[i])}°`;
+          col.querySelector('.day-max').textContent  = `${Math.round(maxTemp)}°`;
+          col.querySelector('.day-min').textContent  = `${Math.round(minTemp)}°`;
         });
       } catch(e) {
         document.querySelectorAll('.day-col').forEach(c => { c.querySelector('.day-name').textContent = '--'; });
