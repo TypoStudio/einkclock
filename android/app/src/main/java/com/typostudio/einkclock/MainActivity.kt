@@ -1,6 +1,8 @@
 package com.typostudio.einkclock
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -49,7 +51,16 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        webView.webViewClient = WebViewClient()
+        webView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+                val scheme = request.url.scheme ?: return false
+                if (scheme == "http" || scheme == "https") {
+                    startActivity(Intent(Intent.ACTION_VIEW, request.url))
+                    return true
+                }
+                return false
+            }
+        }
 
         webView.loadUrl("file:///android_asset/index.html")
 
