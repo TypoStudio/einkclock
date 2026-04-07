@@ -69,6 +69,14 @@
     #lock-btn   { top: 3vmin; right: 3vmin; }
     #orient-btn { top: 3vmin; right: 12vmin; }
     body.analog #help-btn { display: none; }
+    #help-header { display: flex; justify-content: space-between; align-items: center;
+      width: 88vmin; margin-bottom: 4vmin; }
+    #lang-select { font-size: 3.8vmin; font-family: inherit; background: none; color: inherit;
+      border: 1px solid; padding: 0.5vmin 1.5vmin; cursor: pointer; }
+    body.light #lang-select { border-color: #000; color: #000; }
+    #help-close-top { font-size: 3.8vmin; font-family: inherit; background: none; color: inherit;
+      border: 1px solid; padding: 0.5vmin 2vmin; cursor: pointer; line-height: 1; }
+    body.light #help-close-top { border-color: #000; color: #000; }
     /* 아날로그: 하단 중앙 4버튼 */
     body.analog #invert-btn, body.analog #mode-btn,
     body.analog #lock-btn,   body.analog #orient-btn {
@@ -111,10 +119,6 @@
     #help-content ul { padding-left: 4vmin; }
     #help-content .row { display: flex; gap: 2vmin; align-items: baseline; margin: 0.8vmin 0; }
     #help-content .label { min-width: 22vmin; font-weight: 700; }
-    #help-close { display: block; margin: 7vmin auto 0; font-size: 4vmin; background: none;
-      border: 1px solid; color: inherit; font-family: 'Courier New', Courier, monospace;
-      padding: 1.5vmin 8vmin; cursor: pointer; letter-spacing: 0.1em; }
-    body.light #help-close { border-color: #000; color: #000; }
 
 
     /* ── 디지털 컨텐츠 ── */
@@ -334,64 +338,32 @@
 
   <!-- 도움말 팝업 -->
   <div id="help-overlay">
-    <div id="help-content">
-      <h2>사용법</h2>
-
-      <h3>공통 버튼</h3>
-      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vmin;vertical-align:middle">light_mode</span> 버튼</span><span>화면 밝기 반전 (흑·백 전환)</span></div>
-      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vmin;vertical-align:middle">schedule</span> 버튼</span><span>디지털 ↔ 아날로그 모드 전환</span></div>
-      <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vmin;vertical-align:middle">help_outline</span> 버튼</span><span>이 도움말 표시 (디지털 모드에서만)</span></div>
-
-      <h3>디지털 모드</h3>
-      <ul>
-        <li>화면을 두 번 연속 터치하면 전체화면으로 전환됩니다.</li>
-        <li>날짜를 터치하면 달력이 표시됩니다. 다시 터치하면 날씨로 돌아옵니다.</li>
-        <li>달력에서 ‹ / › 버튼으로 이전·다음 달로 이동합니다.</li>
-        <li>날씨 지역명을 터치하면 위치를 변경할 수 있습니다.</li>
-        <li>날씨 설명 아래 ▼ 버튼으로 주간 예보 지역을 선택합니다.</li>
-      </ul>
-
-      <h3>아날로그 모드</h3>
-      <ul>
-        <li>시계를 한 번 터치하면 눈금 스타일이 순서대로 바뀝니다.</li>
-        <li>시계를 두 번 연속 터치하면 전체화면으로 전환됩니다.</li>
-        <li>시계 <strong>중앙</strong>을 터치하면 바늘 구성이 순환합니다.<br>
-          시분초침 → 시분침 → 시침 → 시·분침 사이 반전 → 반원 반전 → 코닉 그라데이션</li>
-      </ul>
-      <div class="row"><span class="label">0 — 원형</span><span>눈금 없음</span></div>
-      <div class="row"><span class="label">1 — 원형</span><span>4분할 눈금</span></div>
-      <div class="row"><span class="label">2 — 원형</span><span>12분할 눈금</span></div>
-      <div class="row"><span class="label">3 — 원형</span><span>60선 눈금</span></div>
-      <div class="row"><span class="label">4 — 원형</span><span>60점 눈금</span></div>
-      <div class="row"><span class="label">5 — 사각형</span><span>60선 눈금 (각도기준)</span></div>
-      <div class="row"><span class="label">6 — 사각형</span><span>60점 눈금 (각도기준)</span></div>
-      <div class="row"><span class="label">7 — 사각형</span><span>60점 눈금 (균등배치)</span></div>
-      <div class="row"><span class="label">8 — 전체화면</span><span>60선 눈금 (균등배치)</span></div>
-      <div class="row"><span class="label">9 — 전체화면</span><span>60선 눈금 (각도기준)</span></div>
-      <div class="row"><span class="label">10 — 전체화면</span><span>60점 눈금 (각도기준)</span></div>
-      <div class="row"><span class="label">11 — 전체화면</span><span>60점 눈금 (균등배치)</span></div>
-
-      <h3>Android 앱 설치</h3>
-      <ul>
-        <li>Luna X 등 e-ink Android 단말기에 앱으로 설치할 수 있습니다.</li>
-        <li><a href="https://github.com/TypoStudio/einkclock/releases/latest" target="_blank" style="color:inherit;">GitHub Releases</a>에서 최신 APK를 다운로드하세요.</li>
-        <li>설치 전 <strong>설정 → 보안 → 알 수 없는 앱 설치</strong> 허용이 필요합니다.</li>
-        <li>다운로드한 APK 파일을 터치하여 설치합니다.</li>
-      </ul>
-
-      <button id="help-close">닫기</button>
-
-      <div style="margin-top:8vmin; text-align:center; font-size:3vmin; opacity:0.5; line-height:2;">
-        <div>v1.1.26</div>
-        <div>Copyright &copy; 2026 TypoStudio</div>
-        <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;" target="_blank">github.com/TypoStudio/einkclock</a></div>
-      </div>
-
-      <div style="margin-top:4vmin; text-align:center; font-size:2.5vmin; opacity:0.35; line-height:2.2;">
-        <div>날씨: <a href="https://api.met.no/" style="color:inherit;" target="_blank">MET Norway (api.met.no)</a> · CC BY 4.0</div>
-        <div>위치검색: <a href="https://nominatim.openstreetmap.org/" style="color:inherit;" target="_blank">Nominatim / OpenStreetMap</a> · ODbL</div>
-      </div>
+    <div id="help-header">
+      <select id="lang-select">
+        <option value="ko">한국어</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+        <option value="hi">हिन्दी</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="ar">العربية</option>
+        <option value="bn">বাংলা</option>
+        <option value="ru">Русский</option>
+        <option value="pt">Português</option>
+        <option value="ur">اردو</option>
+        <option value="id">Bahasa Indonesia</option>
+        <option value="de">Deutsch</option>
+        <option value="ja">日本語</option>
+        <option value="pcm">Naijá</option>
+        <option value="mr">मराठी</option>
+        <option value="te">తెలుగు</option>
+        <option value="tr">Türkçe</option>
+        <option value="ta">தமிழ்</option>
+        <option value="yue">粵語</option>
+      </select>
+      <button id="help-close-top">✕</button>
     </div>
+    <div id="help-content"></div>
   </div>
   <!-- 디지털 모드 -->
   <div id="digital-content">
@@ -475,24 +447,112 @@
   </div><!-- /#screen -->
 
   <script>
-    const DAYS_FULL  = ['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
-    const DAYS_SHORT = ['일','월','화','수','목','금','토'];
+    const LOCALE_CACHE = {};
 
-    const DEFAULT_LOCS = [
-      { name: '구로3동', lat: 37.4954, lon: 126.8874 },
-      { name: '신갈동',  lat: 37.2742, lon: 127.1166 },
-    ];
+    function buildLocale(d) {
+      return {
+        today: d.today, loading: d.loading, error: d.error,
+        weather_detail: (feels, humid, wind) =>
+          `<span style="white-space:nowrap">${d.feels_label}${feels}°</span> ` +
+          `<span style="white-space:nowrap">${d.humid_label}${humid}%</span> ` +
+          `<span style="white-space:nowrap">${d.wind_label}${wind}</span>`,
+        w: {
+          clearsky: d.w_clearsky, fair: d.w_fair, cloudy: d.w_cloudy, fog: d.w_fog,
+          thunder: d.w_thunder, snow_shower: d.w_snow_shower, sleet: d.w_sleet,
+          snow: d.w_snow, shower: d.w_shower, rain: d.w_rain, unknown: d.w_unknown,
+        },
+        searching: d.searching, no_results: d.no_results,
+        n_results: n => `${d.n_results_prefix || ''}${n}${d.n_results_suffix || ''}`,
+        search_error: d.search_error, getting_location: d.getting_location,
+        geocoding_error: d.geocoding_error, location_error: d.location_error,
+        geo_errors: { 1: d.geo_error_1, 2: d.geo_error_2, 3: d.geo_error_3 },
+        nominatim_lang: d.nominatim_lang, nominatim_cc: d.nominatim_cc || '',
+        default_locs: d.default_locs,
+        modal_title: d.modal_title, modal_placeholder: d.modal_placeholder,
+        modal_search: d.modal_search, modal_gps: d.modal_gps, modal_close: d.modal_close,
+        help_html: buildHelpHtml(d),
+      };
+    }
+
+    function buildHelpHtml(d) {
+      const v = 'v1.1.29';
+      const styles = [
+        [`0 — ${d.help_style_circle}`, d.help_tick_none],
+        [`1 — ${d.help_style_circle}`, d.help_tick_4],
+        [`2 — ${d.help_style_circle}`, d.help_tick_12],
+        [`3 — ${d.help_style_circle}`, d.help_tick_60l],
+        [`4 — ${d.help_style_circle}`, d.help_tick_60d],
+        [`5 — ${d.help_style_rect}`,   d.help_tick_60l_a],
+        [`6 — ${d.help_style_rect}`,   d.help_tick_60d_a],
+        [`7 — ${d.help_style_rect}`,   d.help_tick_60d_u],
+        [`8 — ${d.help_style_full}`,   d.help_tick_60l_u],
+        [`9 — ${d.help_style_full}`,   d.help_tick_60l_a],
+        [`10 — ${d.help_style_full}`,  d.help_tick_60d_a],
+        [`11 — ${d.help_style_full}`,  d.help_tick_60d_u],
+      ];
+      const analog3 = (d.help_analog_3 || '').replace('{center}',
+        `<strong>${d.help_analog_center || 'center'}</strong>`);
+      return `<h2>${d.help_title}</h2>
+    <h3>${d.help_s_buttons}</h3>
+    <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vmin;vertical-align:middle">light_mode</span></span><span>${d.help_btn_theme}</span></div>
+    <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vmin;vertical-align:middle">schedule</span></span><span>${d.help_btn_mode}</span></div>
+    <div class="row"><span class="label"><span class="material-symbols-outlined" style="font-size:4.5vmin;vertical-align:middle">help_outline</span></span><span>${d.help_btn_help}</span></div>
+    <h3>${d.help_s_digital}</h3>
+    <ul>
+      <li>${d.help_digital_1}</li>
+      <li>${d.help_digital_2}</li>
+      <li>${d.help_digital_3}</li>
+      <li>${d.help_digital_4}</li>
+      <li>${d.help_digital_5}</li>
+    </ul>
+    <h3>${d.help_s_analog}</h3>
+    <ul>
+      <li>${d.help_analog_1}</li>
+      <li>${d.help_analog_2}</li>
+      <li>${analog3}<br>${d.help_analog_3_cycle}</li>
+    </ul>
+    ${styles.map(([l, r]) => `<div class="row"><span class="label">${l}</span><span>${r}</span></div>`).join('\n    ')}
+    <h3>${d.help_s_android}</h3>
+    <ul>
+      <li>${d.help_android_1}</li>
+      <li>${d.help_android_2_pre}<a href="https://github.com/TypoStudio/einkclock/releases/latest" target="_blank" style="color:inherit;">${d.help_android_2_link}</a>${d.help_android_2_post}</li>
+      <li>${d.help_android_3}</li>
+      <li>${d.help_android_4}</li>
+    </ul>
+    <div style="margin-top:8vmin;text-align:center;font-size:3vmin;opacity:0.5;line-height:2;">
+      <div>${v}</div><div>Copyright &copy; 2026 TypoStudio</div>
+      <div><a href="https://github.com/TypoStudio/einkclock" style="color:inherit;" target="_blank">github.com/TypoStudio/einkclock</a></div>
+    </div>
+    <div style="margin-top:4vmin;text-align:center;font-size:2.5vmin;opacity:0.35;line-height:2.2;">
+      <div>${d.help_credit_weather}: <a href="https://api.met.no/" style="color:inherit;" target="_blank">MET Norway (api.met.no)</a> · CC BY 4.0</div>
+      <div>${d.help_credit_location}: <a href="https://nominatim.openstreetmap.org/" style="color:inherit;" target="_blank">Nominatim / OpenStreetMap</a> · ODbL</div>
+    </div>`;
+    }
+
+    async function loadLocale(code) {
+      if (LOCALE_CACHE[code]) return LOCALE_CACHE[code];
+      const res = await fetch(`locales/${code}.json`);
+      if (!res.ok) throw new Error(`locale ${code} not found`);
+      const data = await res.json();
+      LOCALE_CACHE[code] = buildLocale(data);
+      return LOCALE_CACHE[code];
+    }
+
+    let lang = localStorage.getItem('eink_lang') || (navigator.language.startsWith('ko') ? 'ko' : 'en');
+    let L = null;
     
     let clockMode = localStorage.getItem('eink_cmode') || 'digital';
 
     function loadLocs() {
       try { const s = localStorage.getItem('eink_locs'); if (s) return JSON.parse(s); } catch(e) {}
-      return DEFAULT_LOCS.map(l => ({...l}));
+      return L.default_locs.map(l => ({...l}));
     }
     function saveLocs() { localStorage.setItem('eink_locs', JSON.stringify(locs)); }
 
-    let locs = loadLocs();
+    let locs = [];
     let weeklyLocIdx = parseInt(localStorage.getItem('eink_wloc') || '0');
+    const weatherCache = [null, null];
+    let weeklyCache = null;
 
     function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -592,11 +652,11 @@
       const now = new Date();
       document.getElementById('clock-h').textContent = pad(now.getHours());
       const ss = pad(now.getSeconds());
-      const sp = orient === 1 || orient === 3 ? '.' : ' . ';
       document.getElementById('clock-s').innerHTML = `<span>${ss[0]}</span><span>${ss[1]}</span>`;
       document.getElementById('clock-m').textContent = pad(now.getMinutes());
-      document.getElementById('date').textContent    = `${now.getFullYear()}${sp}${pad(now.getMonth()+1)}${sp}${pad(now.getDate())}`;
-      document.getElementById('day').textContent     = DAYS_FULL[now.getDay()];
+      document.getElementById('date').textContent    = new Intl.DateTimeFormat(lang, { year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
+        .replace(/-/g, '.').replace(/\.\s*$/, '').replace(/\s*\.\s*/g, ' . ').trim();
+      document.getElementById('day').textContent     = new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(now);
     }
 
     /* ── 아날로그 시계 ── */
@@ -1200,17 +1260,17 @@
     /* ── 날씨 심볼 (api.met.no) ── */
     function symbolToInfo(code) {
       const s = code.replace(/_(day|night|polartwilight)$/, '');
-      if (s === 'clearsky')                          return { icon: 'wb_sunny',          desc: '맑음' };
-      if (s === 'fair' || s === 'partlycloudy')      return { icon: 'partly_cloudy_day', desc: '구름 조금' };
-      if (s === 'cloudy')                            return { icon: 'cloud',             desc: '흐림' };
-      if (s === 'fog')                               return { icon: 'foggy',             desc: '안개' };
-      if (s.includes('thunder'))                    return { icon: 'thunderstorm',      desc: '뇌우' };
-      if (s.includes('snow') && s.includes('shower')) return { icon: 'ac_unit',         desc: '눈 소나기' };
-      if (s.includes('sleet'))                      return { icon: 'grain',             desc: '진눈깨비' };
-      if (s.includes('snow'))                       return { icon: 'weather_snowy',     desc: '눈' };
-      if (s.includes('shower'))                     return { icon: 'grain',             desc: '소나기' };
-      if (s.includes('rain'))                       return { icon: 'rainy',             desc: '비' };
-      return { icon: 'question_mark',               desc: '알 수 없음' };
+      if (s === 'clearsky')                          return { icon: 'wb_sunny',          desc: L.w.clearsky };
+      if (s === 'fair' || s === 'partlycloudy')      return { icon: 'partly_cloudy_day', desc: L.w.fair };
+      if (s === 'cloudy')                            return { icon: 'cloud',             desc: L.w.cloudy };
+      if (s === 'fog')                               return { icon: 'foggy',             desc: L.w.fog };
+      if (s.includes('thunder'))                    return { icon: 'thunderstorm',      desc: L.w.thunder };
+      if (s.includes('snow') && s.includes('shower')) return { icon: 'ac_unit',         desc: L.w.snow_shower };
+      if (s.includes('sleet'))                      return { icon: 'grain',             desc: L.w.sleet };
+      if (s.includes('snow'))                       return { icon: 'weather_snowy',     desc: L.w.snow };
+      if (s.includes('shower'))                     return { icon: 'grain',             desc: L.w.shower };
+      if (s.includes('rain'))                       return { icon: 'rainy',             desc: L.w.rain };
+      return { icon: 'question_mark',               desc: L.w.unknown };
     }
 
     function calcFeelsLike(tempC, windKmh) {
@@ -1220,11 +1280,23 @@
     }
 
     /* ── 현재 날씨 ── */
+    function renderWeatherCol(idx) {
+      const cache = weatherCache[idx];
+      if (!cache) return;
+      const col = document.getElementById(`w${idx}`);
+      const { icon, desc } = symbolToInfo(cache.symbol);
+      col.querySelector('.w-icon').textContent   = icon;
+      col.querySelector('.w-temp').textContent   = `${Math.round(cache.d.air_temperature)}°`;
+      col.querySelector('.w-desc').textContent   = desc;
+      col.querySelector('.w-detail').innerHTML =
+        L.weather_detail(Math.round(calcFeelsLike(cache.d.air_temperature, cache.windKmh)), Math.round(cache.d.relative_humidity), Math.round(cache.windKmh));
+    }
+
     async function fetchWeatherFor(idx) {
       const { lat, lon, name } = locs[idx];
       const col = document.getElementById(`w${idx}`);
       col.querySelector('.w-name').textContent = name;
-      col.querySelector('.w-desc').textContent = '로딩중';
+      col.querySelector('.w-desc').textContent = L.loading;
       try {
         const res  = await fetch(
           `https://api.met.no/weatherapi/locationforecast/2.0/compact` +
@@ -1238,14 +1310,10 @@
         );
         const d       = entry.data.instant.details;
         const symbol  = (entry.data.next_1_hours || entry.data.next_6_hours)?.summary.symbol_code || 'clearsky_day';
-        const { icon, desc } = symbolToInfo(symbol);
         const windKmh = d.wind_speed * 3.6;
-        col.querySelector('.w-icon').textContent   = icon;
-        col.querySelector('.w-temp').textContent   = `${Math.round(d.air_temperature)}°`;
-        col.querySelector('.w-desc').textContent   = desc;
-        col.querySelector('.w-detail').textContent =
-          `체감${Math.round(calcFeelsLike(d.air_temperature, windKmh))}° 습도${Math.round(d.relative_humidity)}% 풍량${Math.round(windKmh)}`;
-      } catch(e) { col.querySelector('.w-desc').textContent = '오류'; }
+        weatherCache[idx] = { d, symbol, windKmh };
+        renderWeatherCol(idx);
+      } catch(e) { col.querySelector('.w-desc').textContent = L.error; }
     }
 
     function fetchAllWeather() {
@@ -1265,6 +1333,18 @@
       }
     }
 
+    function renderWeeklyFromCache() {
+      if (!weeklyCache) return;
+      weeklyCache.forEach((entry, i) => {
+        const col = document.getElementById(`wd${i}`);
+        if (!col) return;
+        col.querySelector('.day-name').textContent = entry.isToday ? L.today : new Intl.DateTimeFormat(lang, { weekday: 'short' }).format(new Date(2017, 0, entry.dow));
+        col.querySelector('.day-icon').textContent = entry.icon;
+        col.querySelector('.day-max').textContent  = `${Math.round(entry.maxTemp)}°`;
+        col.querySelector('.day-min').textContent  = `${Math.round(entry.minTemp)}°`;
+      });
+    }
+
     async function fetchWeekly(idx) {
       weeklyLocIdx = idx;
       localStorage.setItem('eink_wloc', idx);
@@ -1277,27 +1357,21 @@
         );
         const data = await res.json();
         const ts   = data.properties.timeseries;
-        const toLocalDate = t => new Date(t).toLocaleDateString('en-CA', { timeZone: 'Asia/Seoul' });
+        const toLocalDate = t => new Date(t).toLocaleDateString('en-CA');
         const byDate = {};
         ts.forEach(e => { const d = toLocalDate(e.time); (byDate[d] = byDate[d] || []).push(e); });
         const todayStr = toLocalDate(new Date());
+        weeklyCache = [];
         Object.keys(byDate).sort().slice(0, 7).forEach((dateStr, i) => {
-          const col = document.getElementById(`wd${i}`);
-          if (!col) return;
           const entries = byDate[dateStr];
           const temps   = entries.map(e => e.data.instant.details.air_temperature);
           const maxTemp = Math.max(...temps), minTemp = Math.min(...temps);
           const mid     = entries[Math.floor(entries.length / 2)];
           const symbol  = (mid.data.next_1_hours || mid.data.next_6_hours || mid.data.next_12_hours)?.summary.symbol_code || 'clearsky_day';
           const { icon } = symbolToInfo(symbol);
-          const isToday  = dateStr === todayStr;
-          const dow      = new Date(dateStr + 'T12:00:00').getDay();
-          col.className  = 'day-col';
-          col.querySelector('.day-name').textContent = isToday ? '오늘' : DAYS_SHORT[dow];
-          col.querySelector('.day-icon').textContent = icon;
-          col.querySelector('.day-max').textContent  = `${Math.round(maxTemp)}°`;
-          col.querySelector('.day-min').textContent  = `${Math.round(minTemp)}°`;
+          weeklyCache.push({ isToday: dateStr === todayStr, dow: new Date(dateStr + 'T12:00:00').getDay(), icon, maxTemp, minTemp });
         });
+        renderWeeklyFromCache();
       } catch(e) {
         document.querySelectorAll('.day-col').forEach(c => { c.querySelector('.day-name').textContent = '--'; });
       }
@@ -1341,14 +1415,14 @@
     async function doSearch() {
       const q = modalInput.value.trim();
       if (!q) return;
-      modalStatus.textContent = '검색중...'; modalResults.innerHTML = '';
+      modalStatus.textContent = L.searching; modalResults.innerHTML = '';
       try {
         const res   = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=6&accept-language=ko&countrycodes=kr`
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=6&accept-language=${L.nominatim_lang}${L.nominatim_cc}`
         );
         const items = await res.json();
-        if (!items.length) { modalStatus.textContent = '결과 없음'; return; }
-        modalStatus.textContent = `${items.length}개 결과`;
+        if (!items.length) { modalStatus.textContent = L.no_results; return; }
+        modalStatus.textContent = L.n_results(items.length);
         items.forEach(item => {
           const div = document.createElement('div');
           div.className = 'result-item';
@@ -1361,7 +1435,7 @@
           });
           modalResults.appendChild(div);
         });
-      } catch(e) { modalStatus.textContent = '검색 오류'; }
+      } catch(e) { modalStatus.textContent = L.search_error; }
     }
 
     modalBtn.addEventListener('click', doSearch);
@@ -1371,23 +1445,22 @@
     const modalGps = document.getElementById('modal-gps');
     if (!('geolocation' in navigator)) modalGps.style.display = 'none';
     modalGps.addEventListener('click', () => {
-      modalStatus.textContent = '위치 확인중...'; modalResults.innerHTML = '';
+      modalStatus.textContent = L.getting_location; modalResults.innerHTML = '';
       navigator.geolocation.getCurrentPosition(async pos => {
         const { latitude: lat, longitude: lon } = pos.coords;
         try {
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=ko&zoom=18`
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=${L.nominatim_lang}&zoom=18`
           );
           const data = await res.json();
           const a = data.address || {};
           const q = a.city_district || a.borough || a.town || a.village || a.city || a.county || '';
-          if (!q) { modalStatus.textContent = '결과 없음'; return; }
+          if (!q) { modalStatus.textContent = L.no_results; return; }
           modalInput.value = q;
           doSearch();
-        } catch(e) { modalStatus.textContent = '위치 변환 오류'; }
+        } catch(e) { modalStatus.textContent = L.geocoding_error; }
       }, err => {
-        const msgs = { 1: '위치 권한이 거부됨', 2: '위치를 확인할 수 없음', 3: '시간 초과' };
-        modalStatus.textContent = msgs[err.code] || '위치 오류';
+        modalStatus.textContent = L.geo_errors[err.code] || L.location_error;
       }, { timeout: 10000 });
     });
 
@@ -1399,8 +1472,7 @@
 
     function renderCalendar() {
       const today = new Date();
-      const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-      calTitle.textContent = `${calYear}년 ${months[calMonth]}`;
+      calTitle.textContent = new Intl.DateTimeFormat(lang, { year: 'numeric', month: 'long' }).format(new Date(calYear, calMonth, 1));
       const firstDay    = new Date(calYear, calMonth, 1).getDay();
       const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
       calGrid.innerHTML = '';
@@ -1433,15 +1505,17 @@
       calOverlay.classList.remove('open');
       document.body.classList.remove('cal-open');
     }
-    document.getElementById('date').addEventListener('touchend', e => {
-      e.stopPropagation();
-      if (locked) return;
-      calOverlay.classList.contains('open') ? closeCal() : openCal();
-    });
-    document.getElementById('day').addEventListener('touchend', e => {
-      e.stopPropagation();
-      if (locked) return;
-      calOverlay.classList.contains('open') ? closeCal() : openCal();
+    ['touchend', 'click'].forEach(ev => {
+      document.getElementById('date').addEventListener(ev, e => {
+        e.stopPropagation(); if (ev === 'touchend') e.preventDefault();
+        if (locked) return;
+        calOverlay.classList.contains('open') ? closeCal() : openCal();
+      });
+      document.getElementById('day').addEventListener(ev, e => {
+        e.stopPropagation(); if (ev === 'touchend') e.preventDefault();
+        if (locked) return;
+        calOverlay.classList.contains('open') ? closeCal() : openCal();
+      });
     });
     document.getElementById('cal-prev').addEventListener('click', e => {
       e.stopPropagation();
@@ -1454,25 +1528,61 @@
       renderCalendar();
     });
 
+    /* ── i18n ── */
+    async function applyLang(l) {
+      try {
+        L = await loadLocale(l);
+      } catch(e) {
+        if (l !== 'en' && l !== 'ko') {
+          try { L = await loadLocale('en'); l = 'en'; } catch(_) { return; }
+        } else return;
+      }
+      lang = l;
+      localStorage.setItem('eink_lang', l);
+      document.documentElement.lang = l;
+      document.getElementById('help-content').innerHTML = L.help_html;
+      document.getElementById('modal-title').textContent = L.modal_title;
+      document.getElementById('modal-input').placeholder  = L.modal_placeholder;
+      document.getElementById('modal-btn').textContent   = L.modal_search;
+      document.getElementById('modal-gps').textContent   = L.modal_gps;
+      document.getElementById('modal-close').textContent = L.modal_close;
+      const calDayEls = document.querySelectorAll('.cal-day-name');
+      calDayEls.forEach((el, i) => {
+        el.textContent = new Intl.DateTimeFormat(lang, { weekday: 'narrow' }).format(new Date(2017, 0, i));
+      });
+      document.getElementById('lang-select').value = l;
+      if (document.getElementById('cal-overlay').classList.contains('open')) renderCalendar();
+      weatherCache.forEach((_, i) => renderWeatherCol(i));
+      renderWeeklyFromCache();
+      updateClock();
+      if (clockMode === 'analog') { staticLayerKey = null; handsLayerKey = null; drawAnalog(); }
+    }
+
     /* ── 도움말 ── */
     const helpOverlay = document.getElementById('help-overlay');
     document.getElementById('help-btn').addEventListener('click', () => helpOverlay.classList.toggle('open'));
-    document.getElementById('help-close').addEventListener('click', () => helpOverlay.classList.remove('open'));
+    document.getElementById('help-close-top').addEventListener('click', () => helpOverlay.classList.remove('open'));
+    document.getElementById('lang-select').addEventListener('change', e => applyLang(e.target.value));
 
     /* ── 시작 ── */
     applyClockMode(clockMode);
-    updateClock();
-    setInterval(updateClock, 1000);
     renderWeeklyPlaceholder();
-    fetchAllWeather();
-    fetchWeekly(weeklyLocIdx);
-    setInterval(() => fetchWeekly(weeklyLocIdx), 60 * 60 * 1000);
-
-    document.getElementById('weekly-section').addEventListener('touchend', e => {
-      e.stopPropagation();
-      if (locked) return;
+    applyLang(lang).then(() => {
+      locs = loadLocs();
+      updateClock();
+      setInterval(updateClock, 1000);
       fetchAllWeather();
       fetchWeekly(weeklyLocIdx);
+      setInterval(() => fetchWeekly(weeklyLocIdx), 60 * 60 * 1000);
+    });
+
+    ['touchend', 'click'].forEach(ev => {
+      document.getElementById('weekly-section').addEventListener(ev, e => {
+        e.stopPropagation(); if (ev === 'touchend') e.preventDefault();
+        if (locked) return;
+        fetchAllWeather();
+        fetchWeekly(weeklyLocIdx);
+      });
     });
   </script>
 </body>

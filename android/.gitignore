@@ -5,3 +5,4 @@ local.properties
 *.iml
 .idea/
 app/src/main/assets/index.html
+app/src/main/assets/locales/

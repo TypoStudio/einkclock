@@ -25,6 +25,8 @@ fi
 echo "▶ Java: $(${JAVA_HOME:+$JAVA_HOME/bin/}java -version 2>&1 | head -1)"
 echo "▶ index.html → assets 복사"
 cp "$ROOT_DIR/index.html" "$ASSETS_DIR/index.html"
+echo "▶ locales/ → assets 복사"
+cp -r "$ROOT_DIR/locales" "$ASSETS_DIR/"
 
 echo "▶ Gradle $BUILD_TYPE 빌드"
 cd "$ANDROID_DIR"

@@ -17,7 +17,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private val htmlFile get() = File(filesDir, "index.html")
+    private val localesDir get() = File(filesDir, "locales")
     private val updateUrl = "https://raw.githubusercontent.com/TypoStudio/einkclock/main/index.html"
+    private val localeBaseUrl = "https://raw.githubusercontent.com/TypoStudio/einkclock/main/locales"
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,11 +71,18 @@ class MainActivity : AppCompatActivity() {
         if (!htmlFile.exists()) {
             assets.open("index.html").use { it.copyTo(htmlFile.outputStream()) }
         }
+        if (!localesDir.exists()) {
+            localesDir.mkdirs()
+            assets.list("locales")?.forEach { name ->
+                assets.open("locales/$name").use { it.copyTo(File(localesDir, name).outputStream()) }
+            }
+        }
 
         webView.loadUrl("file://${htmlFile.absolutePath}")
 
-        // 백그라운드에서 최신 index.html 다운로드 (다음 실행부터 적용)
+        // 백그라운드에서 최신 파일 다운로드 (다음 실행부터 적용)
         fetchLatestHtml()
+        fetchLatestLocales()
 
         onBackPressedDispatcher.addCallback(this,
             object : androidx.activity.OnBackPressedCallback(true) {
@@ -93,6 +102,19 @@ class MainActivity : AppCompatActivity() {
                 val content = URL(updateUrl).readText(Charsets.UTF_8)
                 htmlFile.writeText(content)
             } catch (_: Exception) { }
+        }.start()
+    }
+
+    private fun fetchLatestLocales() {
+        Thread {
+            localesDir.mkdirs()
+            val names = assets.list("locales") ?: return@Thread
+            names.forEach { name ->
+                try {
+                    val content = URL("$localeBaseUrl/$name").readText(Charsets.UTF_8)
+                    File(localesDir, name).writeText(content)
+                } catch (_: Exception) { }
+            }
         }.start()
     }
 
