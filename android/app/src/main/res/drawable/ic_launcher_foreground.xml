@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- MDI clock-outline (pictogrammers.com/library/mdi/icon/clock-outline/) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- outer circle + hour/minute hands (clock-outline path) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,2C6.5,2 2,6.5 2,12S6.5,22 12,22 22,17.5 22,12 17.5,2 12,2M12,20C7.59,20 4,16.41 4,12S7.59,4 12,4 20,7.59 20,12 16.41,20 12,20M12.5,7H11V13L16.28,16.24L17,15.01L12.5,12.26Z" />
+</vector>

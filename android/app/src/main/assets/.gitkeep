@@ -1,0 +1,2 @@
+# index.html은 빌드 시 루트에서 복사됩니다.
+# scripts/build-android-local.sh 또는 GitHub Actions 워크플로가 처리합니다.
