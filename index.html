@@ -485,7 +485,7 @@
     }
 
     function buildHelpHtml(d) {
-      const v = 'v1.2.1';
+      const v = 'v1.2.2';
       const styles = [
         [`0 — ${d.help_style_circle}`, d.help_tick_none],
         [`1 — ${d.help_style_circle}`, d.help_tick_4],
@@ -565,6 +565,10 @@
     let weeklyCache = null;
 
     function pad(n) { return String(n).padStart(2, '0'); }
+
+    let _dtf = null, _dtfW = null;
+    let _lastH = -1, _lastM = -1, _lastDay = -1;
+    let _clockInterval = null;
 
     /* ── 색상 모드 ── */
     function getInitialMode() { const h = new Date().getHours(); return (h >= 7 && h < 18) ? 'light' : 'dark'; }
@@ -660,13 +664,19 @@
     /* ── 디지털 시계 ── */
     function updateClock() {
       const now = new Date();
-      document.getElementById('clock-h').textContent = pad(now.getHours());
+      const h = now.getHours(), m = now.getMinutes(), d = now.getDate();
       const ss = pad(now.getSeconds());
       document.getElementById('clock-s').innerHTML = `<span>${ss[0]}</span><span>${ss[1]}</span>`;
-      document.getElementById('clock-m').textContent = pad(now.getMinutes());
-      document.getElementById('date').textContent    = new Intl.DateTimeFormat(lang, { year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(now)
-        .filter(p => ['year','month','day'].includes(p.type)).map(p => p.value).join(' . ');
-      document.getElementById('day').textContent     = new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(now);
+      if (h !== _lastH) { document.getElementById('clock-h').textContent = pad(h); _lastH = h; }
+      if (m !== _lastM) { document.getElementById('clock-m').textContent = pad(m); _lastM = m; }
+      if (d !== _lastDay) {
+        if (!_dtf) _dtf = new Intl.DateTimeFormat(lang, { year: 'numeric', month: '2-digit', day: '2-digit' });
+        if (!_dtfW) _dtfW = new Intl.DateTimeFormat(lang, { weekday: 'long' });
+        document.getElementById('date').textContent = _dtf.formatToParts(now)
+          .filter(p => ['year','month','day'].includes(p.type)).map(p => p.value).join(' . ');
+        document.getElementById('day').textContent = _dtfW.format(now);
+        _lastDay = d;
+      }
     }
 
     /* ── 아날로그 시계 ── */
@@ -1548,6 +1558,7 @@
         } else return;
       }
       lang = l;
+      _dtf = null; _dtfW = null; _lastDay = -1;
       localStorage.setItem('eink_lang', l);
       document.documentElement.lang = l;
       document.documentElement.dir = /^(ar|ur|he|fa|yi)/.test(l) ? 'rtl' : 'ltr';
@@ -1569,6 +1580,20 @@
       if (clockMode === 'analog') { staticLayerKey = null; handsLayerKey = null; drawAnalog(); }
     }
 
+    /* ── 시계 타이머 ── */
+    function startClock() {
+      if (_clockInterval) return;
+      updateClock();
+      _clockInterval = setInterval(updateClock, 1000);
+    }
+    function stopClock() {
+      clearInterval(_clockInterval);
+      _clockInterval = null;
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopClock(); else startClock();
+    });
+
     /* ── 도움말 ── */
     const helpOverlay = document.getElementById('help-overlay');
     document.getElementById('help-btn').addEventListener('click', () => helpOverlay.classList.toggle('open'));
@@ -1587,8 +1612,7 @@
     /* ── 시작 ── */
     applyClockMode(clockMode);
     renderWeeklyPlaceholder();
-    updateClock();
-    setInterval(updateClock, 1000);
+    startClock();
     applyLang(lang).then(() => {
       locs = loadLocs();
       fetchAllWeather();
