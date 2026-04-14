@@ -74,9 +74,12 @@
     #lang-select { font-size: 3.8vmin; font-family: inherit; background: none; color: inherit;
       border: 1px solid; padding: 0.5vmin 1.5vmin; cursor: pointer; }
     body.light #lang-select { border-color: #000; color: #000; }
-    #help-close-top { font-size: 3.8vmin; font-family: inherit; background: none; color: inherit;
+    #help-close-top, #help-refresh-top, #help-close-bottom, #help-reset { font-size: 3.8vmin; font-family: inherit; background: none; color: inherit;
       border: 1px solid; padding: 0.5vmin 2vmin; cursor: pointer; line-height: 1; }
-    body.light #help-close-top { border-color: #000; color: #000; }
+    body.light #help-close-top, body.light #help-refresh-top,
+    body.light #help-close-bottom, body.light #help-reset { border-color: #000; color: #000; }
+    #help-top-actions { display: flex; gap: 2vmin; }
+    #help-footer { display: flex; justify-content: flex-end; gap: 2vmin; width: 88vmin; margin-top: 6vmin; }
     /* 아날로그: 하단 중앙 4버튼 */
     body.analog #invert-btn, body.analog #mode-btn,
     body.analog #lock-btn,   body.analog #orient-btn {
@@ -361,9 +364,16 @@
         <option value="ta">தமிழ்</option>
         <option value="yue">粵語</option>
       </select>
-      <button id="help-close-top">✕</button>
+      <div id="help-top-actions">
+        <button id="help-refresh-top">새로고침</button>
+        <button id="help-close-top">✕</button>
+      </div>
     </div>
     <div id="help-content"></div>
+    <div id="help-footer">
+      <button id="help-close-bottom">닫기</button>
+      <button id="help-reset">초기화</button>
+    </div>
   </div>
   <!-- 디지털 모드 -->
   <div id="digital-content">
@@ -475,7 +485,7 @@
     }
 
     function buildHelpHtml(d) {
-      const v = 'v1.2.0';
+      const v = 'v1.2.1';
       const styles = [
         [`0 — ${d.help_style_circle}`, d.help_tick_none],
         [`1 — ${d.help_style_circle}`, d.help_tick_4],
@@ -545,7 +555,7 @@
 
     function loadLocs() {
       try { const s = localStorage.getItem('eink_locs'); if (s) return JSON.parse(s); } catch(e) {}
-      return L.default_locs.map(l => ({...l}));
+      return L ? L.default_locs.map(l => ({...l})) : [];
     }
     function saveLocs() { localStorage.setItem('eink_locs', JSON.stringify(locs)); }
 
@@ -1563,15 +1573,24 @@
     const helpOverlay = document.getElementById('help-overlay');
     document.getElementById('help-btn').addEventListener('click', () => helpOverlay.classList.toggle('open'));
     document.getElementById('help-close-top').addEventListener('click', () => helpOverlay.classList.remove('open'));
+    document.getElementById('help-refresh-top').addEventListener('click', () => location.reload());
+    document.getElementById('help-close-bottom').addEventListener('click', () => helpOverlay.classList.remove('open'));
+    document.getElementById('help-reset').addEventListener('click', () => {
+      localStorage.clear();
+      document.cookie.split(';').forEach(c => {
+        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+      });
+      location.reload();
+    });
     document.getElementById('lang-select').addEventListener('change', e => applyLang(e.target.value));
 
     /* ── 시작 ── */
     applyClockMode(clockMode);
     renderWeeklyPlaceholder();
+    updateClock();
+    setInterval(updateClock, 1000);
     applyLang(lang).then(() => {
       locs = loadLocs();
-      updateClock();
-      setInterval(updateClock, 1000);
       fetchAllWeather();
       fetchWeekly(weeklyLocIdx);
       setInterval(() => fetchWeekly(weeklyLocIdx), 60 * 60 * 1000);
